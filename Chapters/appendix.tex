@@ -1,8 +1,10 @@
+
 \chapter{Appendix}
 \section{Properties of the Laplace transform and transforms of common functions}
 	
 	\begin{table}[bht]
 	\centering
+	\caption{useful properties of the Laplace transform and transform of common functions.} \label{app:lap:properties} \label{app:lap:transforms}
 	\begin{tabular}{c |c |c}
 		\# & $f(t)$ & $\laplace{f(t)}(s)$ \\ \hline
 		1 & $a\, f(t) + b \, g(t)$ & $a \, \hat f(s) + b \, \hat g(s)$ \\ 
@@ -14,16 +16,7 @@
 		7 & $f''(t)$ & $s^2 \hat f(s) - f'(0^+) - s f(0^+)$ \\
 		8 & $\frac {d^n}{dt^n}f(t)$ & $s^n \hat f(s) - \sum_{j=0}^{n-1} s^{n-j-1} f^{(j)}(0^+) $ \\
 		9 & $t^n \, f(t)$ & $(-1)^n \frac{d^n}{ds^n} \hat f(s)$ \\
-		10 & $\big(f\otimes g\big)(t)$ & $\hat f(s) \hat g(s)$ \\
-	\end{tabular}
-	\caption{useful properties of the Laplace transform.} \label{app:lap:properties}
-	\end{table}
-	
-
-	\begin{table}[bht]
-	\centering
-	\begin{tabular}{c |c |c}
-		\# & $f(t)$ & $\laplace{f(t)}(s)$ \\ \hline
+		10 & $\big(f\otimes g\big)(t)$ & $\hat f(s) \hat g(s)$ \\ \hline
 		1 & $1$ & $\frac 1 s$ \\
 		2 & $t$ & $\frac 1 {s^2}$ \\
 		3 & $t^k$ & $\frac{k!}{s^{k+1}}$ \\
@@ -33,8 +26,103 @@
 		7 & $e^{at} \cosh(\omega t)$ & $\frac{s-a}{(s-a)^2 - \omega^2}$ \\
 		8 & $e^{at} \sinh(\omega t)$ & $\frac{\omega}{(s-a)^2 - \omega^2}$ \\
 		9 & $e^{at} t^n$ & $\frac{n!}{(s-a)^{n+1}}$ \\
-		10 & $e^{\alpha t} - e^{\beta t}$ & $\frac{\alpha - \beta}{(s- \alpha)(s-\beta)}$ \\
+		10 & $e^{\alpha t} - e^{\beta t}$ & $\frac{\alpha - \beta}{(s- \alpha)(s-\beta)}$ 
 		
 	\end{tabular}
-	\caption{Laplace transforms of common functions.} \label{app:lap:transforms}
 	\end{table}
+
+\newpage
+\section{Resume: minimization}
+	Given the minimization problem of the form
+	\begin{align*}
+		\textrm{minimize:} \qquad & f(\vett x) \\
+		\textrm{subject to:}\qquad  \ & h_k(\vett x) = 0 \qquad && k=1,\dots, m\\
+		& g_k(\vett x) \geq 0  &&k = 1,\dots,p
+	\end{align*}
+	the solution using the KKT can be found by firstly constructing the lagrangian $\lag $ as
+	\[ \lag(\vett x, \vett \lambda, \vett \mu) = \vett x - \sum_{i=1}^m \lambda_i h_i(\vett x) - \sum_{i=1}^p \mu_i g_i(\vett x) \]
+	Candidates to be minimum point can be computed by using the first order necessary condition (stationarity of the point) that requires:	
+	\begin{align*}
+		\nabla_{\vett x} \lag \big(\vstar x,\vstar \lambda,\vstar \mu\big) & = \vett 0 \\
+		h_k\big(\vstar x\big) & =  0 \qquad && k = 0,\dots, m\\
+		g_k\big(\vstar x\big) & \geq 0 && k = 0,\dots, p \\
+		\mu_k^* g_k\big(\vstar x\big) & = 0 && k = 0,\dots, p \\
+		\mu_k^* & \geq 0 && k = 0,\dots,p
+	\end{align*}
+	Determined the candidates, we have to compute the kernel of the gradient of the qualified constraints $H$ (the set of linearly independent gradients of the active constraints) and verify if the hessian of the lagrangian respect to the variables $\vett x$ is (semi-)positive defined:
+	\[ \vett z^t \nabla_{\vett x} \lag \, \vett z  \begin{cases}
+		> 0 \qquad &:\textrm{sufficient condition} \\
+		\geq 0 \qquad &:\textrm{necessary condition} 
+	\end{cases} \qquad \textrm{with } \vett z \in \ker\{ \nabla H \} \]
+
+\newpage
+\section{Resume: functional minimization}
+	The minimization of a functional $\fun F(x)$ is based on determining the functions $x$ that determines a null first variation $\delta \fun F$ (and for that reason the fundamental lemma of calculus of variation will be used).
+	
+	\paragraph{Variation of the lagrangian} Considering functionals $\F(x)$ that present integral relation with $x$, in the form
+	\[ \fun F(x) = \int_a^b L\Big(x(t), x'(t), t\Big) \, dt \]
+	then the related variation obtained with integration by part is of the form
+	\[ \delta \fun F = \int_a^b \left( \pd L x - \frac d {dt} \pd L{x'} \right) \delta_x\, dt + \left[ \pd L {x'} \delta_x \right]_a^b \]
+	
+	Similarly if $x$ appears in the integral with a derivative up to the second order, then the following relation must be considered:
+	\begin{align*}
+		\fun F(x) & = \int_a^b L\Big(x(t), x'(t), x''(t), t \Big) \, dt \\
+		\delta \fun F & = \left( \pd L x - \frac{d}{dt} \pd L {x'} + \frac{d^2}{dt^2} \pd L{x''} \right) \delta_x \, dt + \left[ \left( \pd L {x'} - \frac d{dt}\pd L{x''} \right) \delta_x \right]_a^b + \left[ -\pd L {x''} \delta_x' \right]_a^b
+	\end{align*}
+	
+
+\newpage
+\section{Resume: optimal control problem}
+	Given the optimal control problem  with states $\vett x$ and controls $\vett u$ in the form
+	\begin{align*}
+		\textrm{minimize:} \qquad & \phi\big(\vett x(a), \vett x(b)\big) + \int_a^b L(\vett x, \vett u, t)\, dt \\
+		\textrm{subejct to:} \qquad & \vett x' = \vett f(\vett x, \vett u, t) && \textrm{ODE}\\
+		& \vett B\big(\vett x(a), \vett x(b)\big) = 0 && \textrm{boundary conditions}\\
+		& \int_a^b \vett g(\vett x,\vett u, t)\, dt = \vett g_0 && \textrm{integral constraints} \\
+		& u \in \mathcal U && \textrm{control domain}
+	\end{align*}
+	the solution can be obtained by firstly removing the integral constraints by replacing each one of them with new ordinary differential equation in the form $z_i' = g_i(\vett x,\vett u, t)$ and two other boundary condition in the form $g_i(a) = 0$ and $g_i(b) = g_{i,0}$. With that stated the every optimal control problem with integral constraint can be rewritten in the form
+	\begin{align*}
+		\textrm{minimize:} \qquad & \phi\big(\vett x(a), \vett x(b)\big) + \int_a^b L(\vett x, \vett u, t)\, dt \\
+		\textrm{subejct to:} \qquad & \vett x' = \vett f(\vett x, \vett u, t) && \textrm{ODE}\\
+		& \vett B\big(\vett x(a), \vett x(b)\big) = 0 && \textrm{boundary conditions} \\
+		& u \in \mathcal U && \textrm{control domain}
+	\end{align*}
+	where the new added variables $\vett z$ associated to the integral constraints are condensed in the state variables $\vett x$.
+	
+	With that said we can compute the hamiltonian $\H$ and the utility function $\B$ of the problem as
+	\begin{align*}
+		\H(\vett x, \vett u, \vett \lambda,t) & = L(\vett x, \vett u, t) - \vett \lambda\cdot \vett f(\vett x, \vett u, t) \\
+		\B\big(\vett x(a),\vett x(b),\vett \mu\big) & = \phi\big(\vett x(a), \vett x(b) \big) - \vett \mu \cdot \vett B\big(\vett x(a),\vett x(b)\big)  
+	\end{align*}
+	The resulting boundary valued problem of the optimal control problem is so
+	\[
+	\left\{ \begin{aligned}
+		& \vett x' = \vett f(x,u,t) = \pd{\mathcal H}{\vett \lambda} && \textrm{: original ODE} \\
+		&\vett \lambda' = - \pd{\mathcal H}{\vett x} && \textrm{: adjoint ODE - co-equations} \\
+		&\vett B\big(\vett x(a),\vett x(b)\big) = 0 && \textrm{: original BC} \\
+		&\left. \begin{aligned}
+			\pd{\B}{\vett x_a} + \vett \lambda(a) \\
+			\pd{\B}{\vett x_b} - \vett \lambda(b)
+		\end{aligned} \qquad \right\} &&\textrm{: adjoint BC} \\
+		& \vett u(t) = \underset{\overline{\vett u} \in \mathcal U}{\textrm{argmin}} \big\{ \H\big(\vett x, \overline{\vett u},\vett \lambda, t\big) \big\} && \textrm{: Pontryagin min principle} \\
+		& \pd{\mathcal H}{\vett u} = 0 && \textrm{: control equation}			
+	\end{aligned} \right. \]
+	where the solution of the Pontryagin minimum principle is the parametric solution that minimize the terms $\H$ that contains only the control $\vett u$ respect to the controls bound $\mathcal U$. 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
