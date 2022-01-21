@@ -197,7 +197,7 @@ With that said the resulting boundary valued problem becomes
 	
 \end{example}
 
-\section{Free time problem}
+\section{Free time problem} \label{sec:freetimeprob}
 Let's consider the problem on which the time $T$ is unknown and so is a variable:
 \begin{align*}
 	\textrm{minimize:} \qquad & \phi\big(x(0),x(T)\big) + \int_0^T  L (x,u,t) \, dt \\
@@ -238,7 +238,7 @@ With that stated the boundary valued problem becomes similar to the formulation 
 			\pd{\mathcal B}{x_a} + \lambda(a) \\
 			\pd{\mathcal B}{x_b} - \lambda(b)
 		\end{aligned} \qquad \right\} &&\textrm{: adjoint BC} \\
-		& u(t) = \underset{u \in \mathcal U}{\textrm{argmin}} \big\{ H\big(x(t), u(t),\lambda(t), t\big) \big\} && \textrm{: Pontryagin min principle} \\
+		& u(t) = \underset{\overline u \in \mathcal U}{\textrm{argmin}} \big\{ \H\big(x, \overline u,\lambda, t\big) \big\} && \textrm{: Pontryagin min principle} \\
 		& \pd{\mathcal H}{u} = 0 && \textrm{: control equation}			
 	\end{aligned} \right. 
 \end{equation}
@@ -286,6 +286,75 @@ With that stated the boundary valued problem becomes similar to the formulation 
 	\end{cases} \]
 \end{example}
 
+
+\begin{example}{: optimal control problem}
+	Given the optimal control problem
+	\begin{align*}
+		\textrm{minimize:} \qquad & \fun F (x,u) = \int_0^2 2x- u^2 \, dt   \\
+		\textrm{subject to:} \qquad & x' = 1-2u \\ & x(0) = 1 \qquad \qquad x(2) = 0
+	\end{align*}
+	the solution can be obtained by computing the hamiltonian $\H$ and the utility function $\B$ related to the problem:
+	\begin{align*}
+		\H(x,u,\lambda) & = 2x - u^2 - \lambda \big(1-2u\big) \\
+		\B(x_0,x_2, \mu_1, \mu_2) & = - \mu_1 \big(x_0-1) - \mu_2 x_2
+	\end{align*}
+	With that stated, the lonely resulting co-equation is $\lambda' = \pd \H x = 2$, determining so that the solution of $\lambda(t)$ is in the form $2t + c_1$ (where $c_1$ is a constant depending from the boundary conditions). The adjoint boundary conditions aren't useful to determine the solution because they trivially solves the parameters $\mu_1,\mu_2$. We still have the control equation that states
+	\[ \pd \H u = -2u + 2\lambda = 0 \qquad \Rightarrow \quad u(t) = \lambda(t) \]
+	Using the original ordinary differential equation we have that $x' = 1 - 4t - 2c_1$ that by integration becomes
+	\[ x(t) = -2t^2 + \big(1-2c_1\big) t + c_2 \]
+	From the boundary condition $x(0) = 1$ we obtain $c_2 = 1$, while considering $x(2) = 0$ we have $c_1 = -5/4$ and so the final control law is
+	\[ u(t) = 2t - \frac 5 4  \]
+\end{example}
+
+\begin{example}{: optimal control problem}
+	
+	To solve the optimal control problem
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^1 t + x - y^2 \, dt   \\
+		\textrm{subject to:} \qquad & x' = x+y \qquad y' = x + yu \\
+		& \int_0^1\sin y\, dt = 3\\
+		& x(0) = 1 \qquad  y(1) = 0 \\
+		& u \in [-2,3]
+	\end{align*}
+	the first thing to do is removing the integral constraint by transforming him in a differential equation with 2 boundary condition as follows:
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^1 t + x - y^2 \, dt   \\
+		\textrm{subject to:} \qquad & x' = x+y \qquad y' = x + yu \qquad z' = \sin y \\
+		& x(0) = 1 \qquad  y(1) = 0 \qquad z(0) = 0 \qquad z(1) = 3 \\
+		& u \in [-2,3]
+	\end{align*}
+	The associated hamiltonian $\H$ and utility function $\B$ of the problem are
+	\begin{align*}
+		\H(x,y,z,\lambda_1, \lambda_2, \lambda_3) & = t + x - y^2 - \lambda_1 (x+y) - \lambda_2 (x+yu) - \lambda_3 (\sin y) \\
+		\B(x_0, y_1, z_0, z_1, \mu_{1\dots 4}) & = -\mu_1 \big(x_0 - 1\big) - \mu_2 y_1 - \mu_3 z_0 - \mu_4 \big(z_1 -3\big) 
+	\end{align*}
+	
+	With that stated the co-equations are computed as
+	\begin{align*}
+		\lambda_1' & = - \pd \H x = -1 + \lambda_1 + \lambda_2 \\
+		\lambda_2' & = - \pd \H y = 2y + \lambda_1 + \lambda_2 u + \lambda_3 \cos y \\
+		\lambda_3' & = - \pd \H z = 0
+	\end{align*}
+	Evaluating the adjoint boundary conditions for the point that present no explicit constraints (so $x_1, y_0$) we retrieve $\lambda_1(1) = 0$ and $\lambda_2(0) = 0$. With the definition of the control equation $\pd \H u =  - \lambda_2 y$ the resulting boundary value problem of the optimal control one is
+	\[ \begin{cases}
+		x' = x+y \\ y' = x + yu \\ z' = \sin y \\ 
+		\lambda_1' = \lambda_1 + \lambda_2 - 1 \\ 
+		\lambda_2' = 2y + \lambda_1 + \lambda_2 y + \lambda_3 \cos y \\
+		\lambda_3' = 0 \\
+		x(0) = 1 \qquad \lambda_1(1) = 0 \\ y(1) = 0 \qquad \lambda_2(0) = 0 \\
+		z(0) = 0 \qquad z(1) = 3 \\
+		-\lambda_2 = 0 \\
+		u = \underset{\overline u \in [-2,3]}{\textrm{argmin}} \left\{ -\lambda_2 y \overline u \right\} 
+	\end{cases} \]
+	where the solution of the Pontryagin minimum principle is 
+	\[ u(t) = \begin{cases}
+		-2 \qquad & \lambda_2 y < 0 \\
+		3 & \lambda_2 y \geq 0 
+	\end{cases} \]
+\end{example}
+
+
+
 \begin{example}{: optimal control problem}
 	Given the optimal control problem
 	\begin{align*}
@@ -313,6 +382,36 @@ With that stated the boundary valued problem becomes similar to the formulation 
 		-1 \qquad & 1 + \lambda_1 - \lambda_2 > 0 \\
 		2 & 1 + \lambda_1 - \lambda_2 < 0
 	\end{cases} \]
+	
+\end{example}
+
+\begin{example}{: free time problem}
+	Given the free time optimal control problem
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^T \big(1+t^2\big) u^2 + y\, dt  \\
+		\textrm{subject to:} \qquad & x' = y + u \qquad y' = xy \\
+		& x(0) = 0\qquad y(T) = 1
+	\end{align*}
+	the first thing to do is to rewrite the statement in a form where the integral bound are known by performing a change of variable $\zeta$ that we arbitrary set to be defined in the domain $[0,1]$ resulting in the transformation $\zeta = t/T$. Following the results explained at page \pageref{sec:freetimeprob} the optimal control problem can so be stated as
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^1 T\Big( \big(1+\zeta^2 T^2\big) u^2(\zeta) + y(\zeta) \Big)\, d\zeta  \\
+		\textrm{subject to:} \qquad & x'(\zeta) = T\Big( y(\zeta) + u(\zeta)\Big) \qquad y' = T x(\zeta)y(\zeta) \\
+		& T'(\zeta) = 0 \\		& x(0) = 0\qquad y(1) = 1
+	\end{align*}
+	The hamiltonian $\H$ related to such problem is so
+	\[ \H = T \big(1+\zeta^2 T^2\big) u^2 + T y - \lambda_1 T \big(y+u\big) - \lambda_2 T x y + 0 \lambda_3 \]
+	Considering the original ordinary differential equation of the problem and the addition of the co-equations the system that needs to be solved is
+	\[ \begin{cases}
+		x'(\zeta) = T\Big( y(\zeta) + u(\zeta)\Big) \\ y' = T x(\zeta)y(\zeta) \\
+		T'(\zeta) = 0 \\
+		\lambda_1'(\zeta) = -\pd \H x = \lambda_2 T y(\zeta) \\
+		\lambda_2'(\zeta) = -\pd \H y = -T +\lambda_1 +\lambda_2 T x(\zeta) \\
+		\lambda_3'(\zeta) = -\pd \H T = - u^2(\zeta) - 3\zeta^2T^2 u^2(\zeta) - y(\zeta) - \lambda_1\Big(y(\zeta) +u(\zeta)\Big) -\lambda_2 x(\zeta)y(\zeta)
+	\end{cases} \]
+	on which the boundary conditions are
+	\[ x(0)=  0 \qquad \lambda_1(1) = 0 \qquad \lambda_2(0) = 0 \qquad y(1) = 1 \qquad \lambda_3(0) = \lambda_3(1) = 0 \]
+	We also need to consider the control law $\pd \H u$ that becomes $2T\big( 1 + \zeta^2 T^2\big)u - \lambda_1 = 0$ and so we can explicit the control $u$ as
+	\[ u(\zeta) = \frac{\lambda_1(\zeta)}{2T \big(1 + \zeta	^2T^2\big)} \]
 	
 \end{example}
 

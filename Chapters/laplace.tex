@@ -187,7 +187,19 @@
 		\[ \tilde x (s) = \frac{s+1 - \frac 1 {1+s}}{s^2-1} \qquad \tilde y(s) = \frac{\frac s {1+s} - 1  - \frac 1 s }{s^2-1} \]
 		
 	\end{example}
-
+	
+	\begin{example}{: computation of the Laplace transform}
+		Given the ordinary differential equation\[ \begin{cases}
+			x'(t) + x(t) = \cos t \\ x(0) = 2
+		\end{cases} \]
+		the solution can be found in the Laplace domain by using the operator $\mathscr L$ on the ODE considering the known transforms, in particular
+		\[ \laplace{x(t)} = \hat x(s) \qquad \laplace{ x'(t)} = s \hat x(s) - x(0) \qquad  \laplace{\cos(t)} = \frac{s}{s^2+1}\]
+		\[ \laplace{x'(t) + x(t) = \cos t} \quad \mapsto \quad s\hat x(s) - 2 + \hat x(s) = \frac{s}{s^2+1} \]
+		Solving this expression for $\hat x(s)$ gives
+		\[ \hat x(s) = \frac{s}{(s+1)(s^2+1)} + \frac 2 {s+1} = \frac{2s^2+ s + 2}{(s+1)(s^2+1)}\]
+	\end{example}
+	
+	
 \section{Inversion of the Laplace transform: partial fraction expansion}
 	
 	The \de{inversion} of a Laplace transform is the step that allow to \textit{transport} the algebraic solution found in the $s$ domain into a time description, and so it's represented by the operator $\aL$.
@@ -422,7 +434,28 @@
 	With all the coefficient defined is possible to express numerically the partial fraction expansion by using the equation \ref{eq:laplace:3mulrcomplroots}:
 	\[ \frac 2 {s-1} + \frac{-s + 3}{(s^2-2s+2)^3} -2 \frac{s-1}{(s^2-2s+2)^2} + \frac 12 \frac{-4s+4}{s^2-2s+2}\]
 
-	
+	\begin{example}{: computation of a partial fraction expansion}
+		Considering the rational polynomial in $s$
+		\[ \xi: \qquad \frac{P(s)}{Q(s)} = \frac{s(s^2+7)}{(s-1)(s+1)^3} = \frac A {s-1} + \frac B {s+1} + \frac C{(s+1)^2} + \frac D{(s+1)^3} \]
+		finding the partial fraction expansion means determining the coefficients $A,B,C,D \in \mathds R$ that satisfies the equation. In order to solve this problem we can define $\zeta$ as the multiplication of $\xi$ by $Q(s)$ and so
+		\[ \zeta: \qquad s(s^2+7) = A (s+1)^3 + B (s-1)(s+1)^2 + C (s-1)(s+1) + D (s-1) \]
+		In order to find some coefficient we can note that such polynomial equation must be verified if we evaluate $\zeta$ for some \textit{strategic} point, in particular for $s = 1$ (that's a root of $Q$) we have $8 = 2^3 A$ that determines $A=1$, while if we evaluate for $s = -1$ we retrieve $-8 = -2D$ and so $D=4$. We can so inflate $\zeta$ by moving on the left hand side the associated terms on $A$ and $D$ determining the rewritten expression:
+		\begin{align*}
+			\zeta_r: \quad s^3 + 7s - A (s^3 + 3s^2 + 3s + 1) - D(s-1) & = B (s-1)(s+1)^2 + C (s-1)(s+1) \\
+			s^3 + 7s -s^3 -3s^2 - 3s - 1 -4s + 4  & = B (s-1)(s^2+2s +1) + C (s^2-1) \\
+			-3s^2 + 3 & = B (s^3 + s^2 -s - 1) + C(s^2-1)
+		\end{align*}
+		
+		In order to determine the value of the other coefficient $B,C$ we can start deriving $\zeta$ in the variable $s$:
+		\[ \zeta' = \frac{d \zeta}{ds}: \qquad -6s = B(3s^2 + 2s -1) + 2Cs \]
+		Evaluating this expression for $s = -1$ (associated to the root of both $B$ and $C$) we have that $6 = -2 C s$ determining $C=-3$; after inflation we so have
+		\begin{align*} 
+			\zeta'_r&: \qquad 0 = B (3s^2+2s-1) \\
+			\zeta'' = \frac{d\zeta'}{ds}&: \qquad 0 = B(6s + 2)
+		\end{align*}
+		With the last evaluation on $s=-1$ we obtain $0 = -4B$ requiring $B=0$; with that said the overall partial fraction expansion is
+		\[ \frac{s(s^2+7)}{(s-1)(s+1)^3} = \frac 1 {s-1} - \frac 3{(s+1)^2} + \frac 4{(s+1)^3} \]
+	\end{example}
 
 \section{Boundary value problem}
 	Usually some differential equation problems requires some condition that are not defined at the initial time $t=0$ of the time axes, but in a more general point $t=t^*$: in order to solve this problem a parametric approach is recomended. As example let's consider the following problem:
@@ -461,6 +494,58 @@
 	\[ x(t) = \antilaplace{\hat x(s)}(t) = (A-1)e^t + (1-A) + t \]
 	The last thing to do now is to evaluate the function $x(t)$ at the time $t=1$ and equal the result to $1$ in order to determine the coefficient $A$ related to the initial first derivative of $x$:
 	\[ x(1) = (A-1) e + (1-A) + 1 = 1 \qquad \Rightarrow \quad A = 1 \]
+	
+	\begin{example}{: boundary value problem}
+		Considering the parametric differential equation problem depending on the parameter $A\in \R$
+		\[ \begin{cases}
+			x''(t) - x'(t) = t \\
+			x(0) = 1 \\ x'(0) = A
+		\end{cases} \]
+		the solution can be found in the Laplace domain; starting off with the transformation of the problem using the $\mathscr L$ operator we have that
+		\[ \laplace{x''(t)} = s^2 \hat x(s) - x'(0) - s x(0) \qquad \laplace{x'(t)} = s \hat x(s) - x(0) \qquad \laplace{t} = \frac 1 {s^2} \]
+		\[ \laplace{x''(t) - x'(t) = t} \quad \mapsto \quad s^2 \hat x(s) - A - s -s\hat x(s) +1 = \frac 1 {s^2} \]
+		Solving this expression for $\hat x(s)$ and performing the partial fraction expansion on the result (whose computation is here skipped) we obtain
+		\begin{align*}
+			\hat x(s) & = \frac{\frac 1 {s^2} + s + A - 1}{s^2-s} = \frac{s^3 + As^2 - s^2 + 1}{s^3(s-1)} \\
+			& = \frac{A+1}{s-1} - \frac A s - \frac 1 {s^2} - \frac 1 {s^3}
+		\end{align*}
+		
+		If we now want to compute the parameter $A$ such that $x(1) = - \frac 1 2$ we need to invert $\hat x(s)$ in order to have the solution in the time domain. Considering so that
+		\[ \antilaplace{\frac 1{s-1}} = e^t \qquad \antilaplace{\frac 1 s} = 1 \qquad \antilaplace{\frac 1 {s^2}} = t \qquad \antilaplace{ \frac 1 {s^3}} = \frac {t^2}{2!} \]
+		and so
+		\begin{align*}
+			 x(t) & = \antilaplace{\hat x(s)} = (A+1)e^t - A - t -\frac {t^2}2  \\
+			 x(1) & = (A+1) e - A - 1 - \frac 1 2 = -\frac 1 2
+		\end{align*}
+		Solving the equation we retrieve the value of $A$ that's $-1$.
+		
+	\end{example}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

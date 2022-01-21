@@ -104,6 +104,27 @@
 		We can see that the both points $\left(\frac 12, \frac 1{\sqrt 2}\right)$ and $\left(\frac 12, -\frac 1{\sqrt 2}\right)$ are local minimum and they are both also global minimum because we can see that $f\left(\frac 12, \frac 1{\sqrt 2}\right) = f\left(\frac 12, - \frac 1{\sqrt 2}\right) = e^{-\frac 1 4}$.
 	\end{example}
 	
+	\begin{example}{: determination of the non-linear system} \label{es:min:esame1}
+		Given the problem
+		\begin{align*}
+			\textrm{minimize:} \qquad & f(x,y,z) = x - y + z^2 \\
+			\textrm{subject to:} \qquad & h_1(x,y,z) = x^2 + y^2 - 2 = 0 \\
+			& h_2(x,y,z) = x+z-1 = 0
+		\end{align*}
+		the solution can be computed by firstly determining the lagrangian $\lag = f - \lambda_1 h_1 - \lambda_2 h_2$ of the problem that's
+		\[ \lag(x,y,z, \lambda_1, \lambda_2) = x-y+z^2 - \lambda_1\big(x^2+y^2-2\big) - \lambda_2\big(x+z-1\big) \]
+		The first order necessary condition related to the Lagrange multipliers states that a point, to be a minimum, must be a stationary one and so the candidate minimum points for this problem can be computed by solving the following system of non-linear equation:
+		\[ \begin{cases}
+			1 - 2\lambda_1 x - \lambda_2 = 0  \qquad & : \pd \lag x \\
+			-1 - 2\lambda_1 y = 0 & :\pd \lag y \\
+			2z - \lambda_2 = 0 & : \pd \lag z\\
+			x^2 + y^2 = 2 & : \pd \lag {\lambda_1} =h_1 \\
+			x + z = 1 & :\pd \lag {\lambda_2} = h_2 
+		\end{cases} \] 
+		
+	\end{example}
+
+	
 	\subsection{Sylvester theorem}
 		The tedious and error prone operation of finding the minimum with the lagrangian multiplier is the one that's performed to determine if the matrix is (or is not) semi positive defined in the kernel $\ker\{\nabla \vett h(\vstar x)\}$ of the gradient of the constraints map. In fact for every stationary point $\vstar x$ of the lagrangian we have to check that
 		\[ \vett z^t \, \nabla_{\vett x}^2 \lag(\vstar x,\vstar\lambda) \, \vett z \geq 0 \qquad \forall \vett z\in \ker\{\nabla \vett h(\vstar x)\} \]
@@ -267,16 +288,41 @@
 	\end{align*}
 	where $f,h_k,g_k: \R^n\rightarrow \R$ are real evaluated function.
 	
-	In order to describe this conditions it's important to define \textbf{set of the active constraints} $\act$ as
+	In order to describe this conditions it's important to define \textbf{set of the \de{active constraints}} $\act$ as
 	\[ \act(\vstar x) = \big\{ k \ | \ g_k(\vstar x) = 0 \big\} \]
 	This means that given the constraints $g\in C(\R^n)$ it's defined as \textit{active} if it happens that the point $\vstar x$ is such that $g(\vstar x) = 0$, so in practical way it's in the \textit{border} between activating and not activating the constraints.
 	
-	\paragraph{First order necessary condition} Lef $f\in C^1(\R^n)$ a function to minimize subjected to the inequality $\vett g\in C^1(\R^n,\R^p)$ and equality $\vett h \in C^1(\R^n,\R^m)$ constraint maps. If $\vstar x$ satisfy constraint qualification then necessary condition for $\vstar x$ to be a local minima is that that exists $m+p$ scalars $\lambda_i,\mu_j$ such that all the following conditions are satisfied:
+	\paragraph{Qualified constraints} Given $\vett g \in C^2(\R^p,\R^n)$ and $\vett h \in C (\R^m,\R^n)$ respectively the inequality and equality constraints map, then a point $\vstar x$ is defined \de{qualified} if the gradients of the active constraints (and the equality ones) are linearly independent, and so
+	\[ \big\{ \nabla g_k(\vstar x) \ : \ k \in \mathcal A(\vstar x) \big\} \big\{ \nabla h_1(\vstar x),\dots, \nabla h_m(\vstar x) \big\} \quad \textrm{: are linearly independent} \]
+	
+	\begin{example}{: qualification of a point} \label{es:min:esame1b}
+		Considering the minimization problem started in example \ref{es:min:esame1} (page \pageref{es:min:esame1}) stated as
+		\begin{align*}
+			\textrm{minimize:} \qquad & f(x,y,z) = x - y + z^2 \\
+			\textrm{subject to:} \qquad & h_1(x,y,z) = x^2 + y^2 - 2 = 0 \\
+			& h_2(x,y,z) = x+z-1 = 0
+		\end{align*}
+		and considering the candidate point of minimum (resulting from the solution of the non-linear system)
+		\[ x^* = \frac{\sqrt 3}{2} - \frac 1 2 \qquad y^* = \frac 1 2 + \frac{\sqrt 3} 2 \qquad z^* = \frac 3 2 - \frac{\sqrt 3}{2} \qquad \lambda_1^* = \frac 1 2 - \frac{\sqrt3}{2} \qquad \lambda_2^* = 3-\sqrt 3 \]
+		In order to check if the chosen point is qualified it's necessary to check if the gradients of the equality constraint and the active ones (that in this case are not present because there aren't inequality constraints) are linearly independent. In order to solve this problem firstly we need to build the matrix $H$ represent the gradients of the constraints:
+		\[ H(x,y,z) = \begin{bmatrix}
+			\nabla h_1(x,y,z) \\ \nabla h_2(x,y,z)
+		\end{bmatrix} = \begin{bmatrix}
+			2x & 2y & 0 \\ 1 & 0 & 1
+		\end{bmatrix} \] \[ \Rightarrow \qquad  H^*=  H(x^*,y^*,z^*) = \begin{bmatrix}
+			\sqrt 3 - 1 & 1 + \sqrt 3 & 0 \\ 1 & 0 & 1
+		\end{bmatrix} \]
+		It's straightforward to see that the lines of the matrix $H^*$ are linearly independent, considering in fact the rank of $H^*$ by analysing the columns we see that's equal to 2, so equalizing the number of the constraints.
+		
+	\end{example}
+	
+	
+	\subsection{First order necessary condition} Lef $f\in C^1(\R^n)$ a function to minimize subjected to the inequality $\vett g\in C^1(\R^n,\R^p)$ and equality $\vett h \in C^1(\R^n,\R^m)$ constraint maps. If $\vstar x$ satisfy constraint qualification then necessary condition for $\vstar x$ to be a local minima is that that exists $m+p$ scalars $\lambda_i,\mu_j$ such that all the following conditions are satisfied:
 	\begin{equation} \label{eq:min:kkt:firstnecessary}
 	\begin{aligned}
 		\nabla_{\vett x} \lag \big(\vstar x,\vstar \lambda,\vstar \mu\big) & = \vett 0 \\
 		h_k\big(\vstar x\big) & =  0 \qquad && k = 0,\dots, m\\
-		g_k\big(\vstar x\big) & \geq && k = 0,\dots, p \\
+		g_k\big(\vstar x\big) & \geq 0 && k = 0,\dots, p \\
 		\mu_k^* g_k\big(\vstar x\big) & = 0 && k = 0,\dots, p \\
 		\mu_k^* & \geq 0 && k = 0,\dots,p
 	\end{aligned}
@@ -347,8 +393,9 @@
 		\[ (x,y) = (0,k) \qquad k\in[0,1] \]
 	\end{example}
 	
-	\paragraph{Second order necessary conditions} Given a function $f \in C^1(\R^n)$ to minimize subject to the equality $\vett h\in C^1(\R^n,\R^m)$ and inequality $\vett g \in C^1(\R^n,\R^p)$ constraint maps, then necessary conditions for a point $\vstar x$ (that satisfies the constraints) to be a local minima is that exists $m+p$ scalars $\lambda_i,\mu_i$ such that satisfy the first order conditions (equation \ref{eq:min:kkt:firstnecessary}) and
-	\begin{equation}
+\subsection{Second order necessary conditions} 
+	Given a function $f \in C^1(\R^n)$ to minimize subject to the equality $\vett h\in C^1(\R^n,\R^m)$ and inequality $\vett g \in C^1(\R^n,\R^p)$ constraint maps, then necessary conditions for a point $\vstar x$ (that satisfies the constraints) to be a local minima is that exists $m+p$ scalars $\lambda_i,\mu_i$ such that satisfy the first order conditions (equation \ref{eq:min:kkt:firstnecessary}) and
+	\begin{equation} \label{eq:min:kktsecondnecessary}
 		\vett z^t \, \nabla^2_{\vett x} \lag\big(\vstar x,\vstar \lambda,\vstar \mu\big) \, \vett z \geq 0
 	\end{equation}	
 	for all vector $\vett z$ such that
@@ -360,7 +407,30 @@
 	In general the conditions $ii)$ and $iii)$ are hard to verify and so to have a less accurate necessary condition (by having a smaller set of possible vector $\vett z$), and so improving the chance of considering point that don't belong to the original domain, this two conditions can be substitute with the expression
 	\[ \nabla g_k(\vstar x) \vett z = 0 \qquad \textrm{for all } k \in \act(\vstar x) \]
 	
-	\paragraph{Second order sufficient conditions} Given a function $f \in C^1(\R^n)$ to minimize subject to the equality $\vett h\in C^1(\R^n,\R^m)$ and inequality $\vett g \in C^1(\R^n,\R^p)$ constraint maps, then sufficient condition for a point $\vstar x$ (that satisfies the constraints) to be a local minima is that exists $m+p$ scalars $\lambda_i,\mu_i$ such that satisfy the first order conditions (equation \ref{eq:min:kkt:firstnecessary}) and 
+	\vspace{3mm}
+	In other words the second order necessary condition (and similarly the sufficient one) states (from equation \ref{eq:min:kktsecondnecessary}) that the the matrix $\nabla^2_{\vett x} \lag$ must be semi-positive defined in the kernel of the active and equality constraints.
+	
+	\begin{example}{: kernel of the active constraints} \label{es:min:esame1c}
+		Continuing examples \ref{es:min:esame1} and \ref{es:min:esame1b} (page \pageref{es:min:esame1b}), on the minimum candidate point $(x^*,y^*,z^*)$ we have the following matrix for the active constraints:
+		\[ H^*= \begin{bmatrix}
+			\sqrt 3 - 1 & 1 + \sqrt 3 & 0 \\ 1 & 0 & 1
+		\end{bmatrix} \]
+		Computing the kernel of the active constraints means so solving the following system of linear equation determined by $H^* \vett x = \vett 0$ and so
+		\[\begin{bmatrix}
+			\sqrt 3 - 1 & 1 + \sqrt 3 & 0 \\ 1 & 0 & 1
+		\end{bmatrix} \begin{pmatrix}
+			x \\ y \\ z
+		\end{pmatrix} = \vector{0 \\ 0}\]
+		resulting in
+		\[ \begin{cases}
+			(\sqrt 3 - 1) x + (1 + \sqrt 3) y = 0 \\ x + z = 0
+		\end{cases} \]
+		Having 3 unknowns but only 2 equation means that we have to solve the problem in a parametric form; chosen $z = t$ we have $x = -t$ and so $y = t \frac{\sqrt 3 - 1}{\sqrt 3 + 1}$; choosing $t = \sqrt 3 + 1$ (to simplify the results) we obtain the generator $K$ of the kernel as
+		\[ K = \vector{ -\sqrt 3 - 1 \\ \sqrt 3 - 1 \\ \sqrt 3 +1 } \] 
+	\end{example}
+	
+\subsection{Second order sufficient conditions} 
+	Given a function $f \in C^1(\R^n)$ to minimize subject to the equality $\vett h\in C^1(\R^n,\R^m)$ and inequality $\vett g \in C^1(\R^n,\R^p)$ constraint maps, then sufficient condition for a point $\vstar x$ (that satisfies the constraints) to be a local minima is that exists $m+p$ scalars $\lambda_i,\mu_i$ such that satisfy the first order conditions (equation \ref{eq:min:kkt:firstnecessary}) and 
 	\begin{equation}
 		\vett z^t \, \nabla^2_{\vett x} \lag\big(\vstar x,\vstar \lambda,\vstar \mu\big) \, \vett z > 0
 	\end{equation}	
@@ -372,7 +442,44 @@
 	\end{align*}
 	As in the previous case in order to have simpler calculation the third equation $iii)$ can be dropped (and so we obtain less accurate solution of the local minima).
 	
+	\begin{example}{: second order check}
+		Given the problem started in example \ref{es:min:esame1} (page \pageref{es:min:esame1}) and carried on up to example \ref{es:min:esame1c} states as
+		\begin{align*}
+			\textrm{minimize:} \qquad & f(x,y,z) = x - y + z^2 \\
+			\textrm{subject to:} \qquad & h_1(x,y,z) = x^2 + y^2 - 2 = 0 \\
+			& h_2(x,y,z) = x+z-1 = 0
+		\end{align*}
+		we found a candidate for minimum point in
+		\[ x^* = \frac{\sqrt 3}{2} - \frac 1 2 \qquad y^* = \frac 1 2 + \frac{\sqrt 3} 2 \qquad z^* = \frac 3 2 - \frac{\sqrt 3}{2} \qquad \lambda_1^* = \frac 1 2 - \frac{\sqrt3}{2} \qquad \lambda_2^* = 3-\sqrt 3 \]
+		that present the matrix $H^*$ for the active constraints with related kernel $K$:
+		\[ H^*= \begin{bmatrix}
+			\sqrt 3 - 1 & 1 + \sqrt 3 & 0 \\ 1 & 0 & 1
+		\end{bmatrix} \qquad \qquad K = \vector{-\sqrt 3 - 1 \\ \sqrt 3 - 1 \\ \sqrt 3 + 1} \]
+		
+		In order to check the second order necessary/sufficient condition we have to compute the hessian matrix $\nabla^2_{\vett x} \lag$ of the lagrangian that's
+		\[ L = \nabla^2_{\vett x} \lag = \begin{bmatrix}
+			-2 \lambda_1 & 0 & 0 \\ 
+			0 & -2 \lambda_1 & 0 \\
+			0 & 0 & 2
+		\end{bmatrix} \qquad \Rightarrow \quad L^* = \begin{bmatrix}
+			\sqrt 3 - 1 & 0 & 0 \\ 0 & \sqrt 3 - 1 & 0 \\ 0 & 0 & 1
+		\end{bmatrix} \]
+		We have now to determine if this resulting matrix is (semi-)positive defined or not in the kernel of active constraints in order to determine if the point is a minimum or not; this mean performing the following matrix multiplication:
+		\begin{align*}
+			\alpha K^t L^* K \alpha & = \alpha \vector{-\sqrt 3 - 1 & \sqrt 3 - 1 & \sqrt 3 + 1} \begin{bmatrix}
+				\sqrt 3 - 1 & 0 & 0 \\ 0 & \sqrt 3 - 1 & 0 \\ 0 & 0 & 1
+			\end{bmatrix} \vector{-\sqrt 3 - 1 \\ \sqrt 3 - 1 \\ \sqrt 3 + 1} \alpha \\
+			& = \alpha \vector{-\sqrt 3 - 1 & \sqrt 3 - 1 & \sqrt 3 + 1}  \vector{-2 \\ 4 -2\sqrt 3 \\ \sqrt 3 + 1} \alpha \\
+			& = \alpha \big( 2\sqrt 3 +2 + 4\sqrt 3 - 4 -6 + 2\sqrt 3 + 3 + 2\sqrt 3 +1 \big) \alpha \\
+			& = \big(10 \sqrt 3 - 4\big)\alpha^2 
+		\end{align*}
+		Observing that for $\alpha \neq 0$ the product is always greater then zero we have that the hessian $L^*$ is positive defined in the kernel of the active constraints, satisfying the second order sufficient condition that allow so to state that
+		\[ \vstar x = \left( \frac{\sqrt 3}{2} - \frac 12, \frac 1 2 + \frac{\sqrt 3}{2}, \frac 3 2 - \frac{\sqrt 3}{2} \right) \qquad \textrm{is a minimum} \]
+	
+	\end{example}
+	
 	\begin{example}{}
+		Given the problem
 		\begin{align*}
 			\textrm{minimize:}&&   f(x,y) &= x^2 - xy \\
 			\textrm{subject to:}&& g_1(x,y) &=  1-x^2-y^2 \geq 0 \\ 
@@ -419,7 +526,52 @@
 	\end{example}
 	
 	
-	
+	\begin{example}{: problem from an exam}
+		Given the problem
+		\begin{align*}
+			\textrm{minimize:} \qquad & f(x,y,z) = x - y + z^2 \\
+			\textrm{subject to:} \qquad & h(x,y,z) = x^2 + y^2 - 2 = 0 \\
+			& g(x,y,z) = x^2-1 \geq 0
+		\end{align*}
+		the solution can be obtained by using the KKT condition; in order to use them we firstly need to define the lagrangian $\lag = f - \lambda h - \mu g$ of the problem that in this is of the form
+		\[ \lag(x,y,z,\lambda,\mu) = x - y + z^2 - \lambda\big(x^2+y^2-2\big) - \mu \big(x^2 - 1\big) \]
+		The first order necessary condition allows to build the system of non-linear equation whose solution are candidates to be minimum point of $f$ (respect to the constrains set), and so we have
+		\[ \begin{cases}
+			1 -2 \lambda x - 2\mu x = 0 & : \pd \lag x \\
+			-1 - 2\lambda y = 0 & : \pd \lag y \\
+			-2z = 0 & : \pd \lag z \\
+			x^2 + y^2 - 2 = 0 & : h \\
+			x^2-1 \geq 0 & : g\\
+			\mu(x^2-1) = 0 &: \mu g\\
+			\mu \geq 0 & : \mu
+		\end{cases} \]
+		Verifying that the point $\vstar x = (1,1,0)$ is a candidate minimum with $\lambda^* = -\frac1 2$ and $\mu^* = 1$ (substituting the values in the system, all the relation are satisfied), the associated set of active constraints is represented by both $h$ (in fact $1+1-2=0$) and $g$ (indeed $1-1=0$) whose gradient can be regarded as
+		\[ \nabla \mathcal A = \begin{bmatrix}
+			\nabla h \\ \nabla g
+		\end{bmatrix} = \begin{bmatrix}
+			2x & 2y & 0 \\ 2x & 0 & 0	
+		\end{bmatrix} \qquad \Rightarrow \quad H = \nabla \mathcal A(\vstar x) = \begin{bmatrix} 
+			2 & 2 & 0 \\ 2 & 0 & 0 
+		\end{bmatrix}\]
+		The constraints are so qualified because the gradients are linearly independent and related kernel, obtained by solving the equation $H\vett x = \vett 0$, gives a generator of the space in the form of $\vett k = (0,0,1)$.
+		
+		In order to determine if $\vstar x$ is a minimum point using the second order necessary/sufficient KKT conditions it's mandatory to compute the hessian $\nabla^2_{\vett x} \lag$ of the lagrangian:
+		\[ \nabla^2_{\vett x} \lag = \begin{bmatrix}
+			-2(\lambda+\mu) & 0 & 0 \\ 0 & -2\lambda & 0 \\ 0 & 0 & - 2
+		\end{bmatrix} \qquad \Rightarrow \quad L = \nabla^2_{\vett x} \lag(\vstar x) = \begin{bmatrix}
+			-1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 2
+		\end{bmatrix}  \]
+		We now need to check if the matrix $L$ is (semi-)positive defined in the kernel of the active constraints, and so we have to compute
+		\begin{align*}
+			\alpha\vett k^t L \vett k \alpha & = \alpha \vector{0 & 0 & 1} \begin{bmatrix}
+				-1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 2
+			\end{bmatrix} \vector{ 0 \\0 \\ 1 } \alpha \\
+		 	& = \alpha \vector{0 & 0 & 1} \vector{0 \\ 0 \\ 2} \alpha \\
+		 	& = 2\alpha^2
+		\end{align*}
+		Observing that this product is always greater then zero for $\alpha \neq 0$, then it means that $L$ is positive defined and so
+		\[ \vstar x = (1,1,0) \qquad \textrm{is a minimum point} \]	
+	\end{example}
 	
 	
 	
