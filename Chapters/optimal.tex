@@ -133,8 +133,8 @@ Compacting the vector of states $\vett x$ and added variable $\vett z$ we can de
 To solve the problem as here state it's necessary to build the function of the boundary conditions $\vett{\mathcal B}$ (depending by the Lagrange multipliers $\vett \mu$), also known as \de{utility function}, and the \de{Hamiltonian} $\mathcal H$ (depending by the multipliers $\vett \lambda$):
 \begin{equation}
 	\begin{split}
-		\vett{\mathcal B}\big(\vett w(a),\vett w(b),\vett \mu\big) & = \psi\big(\vett w(a),\vett w(b)\big) - \vett \mu\cdot \vett B\big( \vett w(a),\vett w(b) \big) \\
-		\mathcal H(\vett w,\vett \lambda,\vett u,t) & = \mathcal M(\vett w, \vett u,t) - \vett \lambda \cdot \vett F(\vett w,\vett u, t)
+		\vett{\mathcal B}\big(\vett w(a),\vett w(b),\vett \mu\big) & = \psi\big(\vett w(a),\vett w(b)\big) + \vett \mu\cdot \vett B\big( \vett w(a),\vett w(b) \big) \\
+		\mathcal H(\vett w,\vett \lambda,\vett u,t) & = \mathcal M(\vett w, \vett u,t) + \vett \lambda \cdot \vett F(\vett w,\vett u, t)
 	\end{split}
 \end{equation}
 At this point it's possible to compute the lagrangian $\mathcal L $ on which the variations can be performed:
@@ -226,7 +226,7 @@ Mathematically this kind of problem is described by
 where $\mathcal U$ is the \textbf{domain of the controls} that, in order for the principle to work, must be convex and compact.
 
 To solve this problem we compute the Hamiltonian $\mathcal H$ and the utility function $\mathcal B$ as in the previous cases:
-\[ \mathcal H (x,u, \lambda,t) = L(x,u,t) - \lambda f(x,u,t) \qquad \qquad \mathcal B (x_a,x_b,\mu) = \phi(x_a,x_b) + \mu b(x_a,x_b) \]
+\[ \mathcal H (x,u, \lambda,t) = L(x,u,t) + \lambda f(x,u,t) \qquad \qquad \mathcal B (x_a,x_b,\mu) = \phi(x_a,x_b) + \mu b(x_a,x_b) \]
 
 With that stated the boundary valued problem becomes similar to the formulation in equation \ref{eq:opt:generalsolution} (page \pageref{eq:opt:generalsolution}) with the addition of the Pontryagin minimum principle:
 \begin{equation} 
@@ -364,14 +364,14 @@ With that stated the boundary valued problem becomes similar to the formulation 
 	\end{align*}
 	the solution can be obtained by firstly computing the hamiltonian $\H$ and the utility function $\B$ of the problems resulting in
 	\begin{align*}
-		\H\big(x,y,u,\lambda_1,\lambda_2\big) & = x^2 + y^2 + u - \lambda_1 \big(y-u\big) - \lambda_2 \big(x + u\big) \\
-		& = x^2 + y^2 + u \big(1 + \lambda_1 - \lambda_2\big) - \lambda_1 y - \lambda_2 x \\
-		\B\big(x(0),x(1), y(0), y(1), \mu\big) & = x(0) - \mu \big( x(1) - 2\big)
+		\H\big(x,y,u,\lambda_1,\lambda_2\big) & = x^2 + y^2 + u + \lambda_1 \big(y-u\big) + \lambda_2 \big(x + u\big) \\
+		& = x^2 + y^2 + u \big(1 - \lambda_1 + \lambda_2\big) + \lambda_1 y + \lambda_2 x \\
+		\B\big(x_0,x_1, \mu\big) & = x_0 + \mu \big( x_1 - 2\big)
 	\end{align*}
-	We can so explicit: the adjoint ordinary differential equations $\lambda_1' = -\pd \H x = - 2x + \lambda_2$, $\lambda_2' = -\pd \H y = -2y + \lambda_1$, the adjoint boundary conditions $\lambda_1(0) = - \pd \B {x_0} = - 1$, $\lambda_1(1) = \pd \B {x_1} = \mu $, $\lambda_2(0) = -\pd \B {y_0} = 0$, $\lambda_2(1) = \pd \B{y_1} = 0$ and the control equation $\pd \H u = 1 + \lambda_1 - \lambda_2 = 0$. With the addition of the original differential equation the boundary value problem becomes
+	We can so explicit: the adjoint ordinary differential equations $\lambda_1' = -\pd \H x = - 2x - \lambda_2$, $\lambda_2' = -\pd \H y = -2y - \lambda_1$, the adjoint boundary conditions $\lambda_1(0) = - \pd \B {x_0} = - 1$, $\lambda_1(1) = \pd \B {x_1} = \mu $, $\lambda_2(0) = -\pd \B {y_0} = 0$, $\lambda_2(1) = \pd \B{y_1} = 0$ and the control equation $\pd \H u = 1 - \lambda_1 + \lambda_2 = 0$. With the addition of the original differential equation the boundary value problem becomes
 	\[ \begin{cases}
 		x' = y - u \\ y' = x+u \\
-		\lambda_1' = -2x + \lambda_2 \\ \lambda_2' = -2y + \lambda_1 \\
+		\lambda_1' = -2x - \lambda_2 \\ \lambda_2' = -2y - \lambda_1 \\
 		\lambda_1(0) = -1 \\ \cancel{\lambda_1(1) = \mu} \qquad \qquad \textrm{: trivially satisfied} \\
 		\lambda_2(0) = \lambda_2(1) = 0 \\
 		1 + \lambda_1 - \lambda_2 = 0 \\
@@ -415,7 +415,41 @@ With that stated the boundary valued problem becomes similar to the formulation 
 	
 \end{example}
 
-
+\begin{example}{: exam's simulation}
+	Given the optimal control problem in the control $u$ and states $x,y$
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^1 \big(1+x^2\big) u^2 \, dt  \\
+		\textrm{subject to:} \qquad & x' = xy - u \qquad y' = x + u \\
+		& \int_0^1\big(x+u\big) \,dt = 2 \\
+		& y(0) = 2
+	\end{align*}
+	the first thing to do is remove the integral constraint by adding a new state variable $z$ such that $z' = x+u$ with boundary conditions $z(0) = 0$ and $z(1) =2$; with that the problem becomes
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^1 \big(1+x^2\big) u^2 \, dt  \\
+		\textrm{subject to:} \qquad & x' = xy - u \qquad y' = x + u \qquad z' = x+u \\
+		& y(0) = 2 \qquad z(0) = 0 \qquad z(1) = 2
+	\end{align*}
+	We can so compute the hamiltonian $\H$ and the utility function $\B$ of the problem as
+	\begin{align*}
+		\H\big(x,y,z,u,\lambda_1,\lambda_2,\lambda_3,t\big) & = \big(1+x^2\big)u^2 + \lambda_1\big(xy -u\big) + \lambda_2 \big(x+u\big) + \lambda_3 \big(x+u\big) \\
+		\B\big(y_0,z_0,z_1, \mu_1, \mu_2,\mu_3\big) & = \mu_1\big(y_0-2\big) + \mu_2 z_0 + \mu_3\big(z_1-2\big)
+	\end{align*}
+	The control obtained by the Pontryagin maximum principle is the solution of $u$ that verifies $\pd \H u = 0$, and so we have
+	\[ \pd \H u = 2\big(1+x^2\big)u -\lambda_1 + \lambda_2 +\lambda_3 \qquad \Rightarrow \quad u(t) = \frac{\lambda_1(t) - \lambda_2(t) - \lambda_3(t)}{2\big(1+x^2\big)} \]
+	The additional adjoint ODE are described by the following derivatives:
+	\begin{align*}
+		\lambda_1' & = -\pd \H x = -2u^2x - \lambda_1 y - \lambda_2 \\
+		\lambda_2' & = -\pd \H y = - \lambda_1 x \\
+		\lambda_3' & = -\pd \H z = 0
+	\end{align*}	
+	while the adjoint boundary conditions are
+	\begin{align*}
+		&\lambda_1(0)  = - \pd \B {x_0} = 0   && \lambda_1(1) = \pd \B{x_1} = 0 \\
+		&\cancel{\lambda_2(0)  = - \pd \B {y_0} = -\mu_1}   && \lambda_2(1) = \pd \B{y_1} = 0 \\
+		&\cancel{\lambda_3(0)  = - \pd \B {z_0} = -\mu_2}   && \cancel{\lambda_3(1)  = \pd \B{z_1} = \mu_3} 
+	\end{align*}
+	Some expression have been cancelled out because they are trivially solved for $\mu_i$.
+\end{example}
 
 
 
