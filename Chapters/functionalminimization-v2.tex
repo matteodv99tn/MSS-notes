@@ -1,4 +1,4 @@
-\chapter{Minimization of a Functional}
+\chapter{Minimization of a Functional} \label{sec:chfunctional}
 
 A classical problem in minimization is the brachistrochrone, so the fastest ultimate curve (meaning determining the fastest trajectory to move from a point $A$ to a point $B$ considering that the only action is the one of the gravity).
 
@@ -597,12 +597,68 @@ The first two lines represent the terms that were always presents in the previou
 	
 \end{example}
 
+\begin{example}{: exam's simulation}
+	Given the functional
+	\begin{align*}
+		\textrm{minimize:} \qquad &\mathcal F(x,y,z) = y(1) + \int_0^1 x^2 + z^2 +x'y' +z'^2 \, dt \\
+		\textrm{subject to:}  \qquad &x(1) = 2
+	\end{align*}
+	the resulting boundary value problem can be stated by determining the first variation of the lagrangian $\lag$ 
+	\begin{align*}
+		\lag(x,y,z,\lambda) =  & \ y(1) + \int_0^1 \underbrace{x^2 + z^2 +x'y' +z'^2}_{=L(x,y,z)}\, dt - \lambda\big(x(1) - 2\big) \\
+		\delta \lag  = & \ \delta_{y(1)} + \int_0^1 \left( \pd L x - \frac d{dt}\pd L{x'} \right) \delta_x\, dt + \left[ \pd L {x'} \delta_x \right]_0^1 \\ & + \int_0^1 \left( \pd L y - \frac d{dt}\pd L{y'} \right) \delta_y\, dt + \left[ \pd L {y'} \delta_y \right]_0^1 \\ & + \int_0^1 \left( \pd L z - \frac d{dt}\pd L{z'} \right) \delta_z\, dt + \left[ \pd L {z'} \delta_z \right]_0^1 
+		+\lambda \delta_{x(1)} + \big(x(1)-2\big) \delta_\lambda \\
+		= & \  \delta_{y(1)} + \int_0^1 \big( 2x - y'' \big) \delta_x\, dt + y'(1)\delta_{x(1)} - y'(0)\delta_{x(0)} \\ &  + \int_0^1 -x'' \delta_y \, dt + x'(1) \delta_{y(1)} - x'(0) \delta_{y(0)} \\ & + \int_0^1 \big(2z - 2z''\big)\delta_z\, dt + 2z'(1) \delta_{z(1)} - 2z'(0) \delta_{z(0)} + \lambda \delta_{x(1)} + \big(x(1)-2\big) \delta_\lambda
+	\end{align*} 
+	Setting to zero the terms associated to each variation $\delta_\cdot$ determines the following boundary value problem, solution of the functional minimization:
+	\[ \begin{cases}
+		2x - y'' = 0 & : \delta_x \\
+		x'' = 0 & : \delta_y \\
+		z - z'' = 0 & : \delta_z \\
+		y'(0) = 0 & : \delta_{x(0)} \\
+		\cancel{y'(1) + \lambda = 0} & : \delta_{x(1)} \textrm{, trivially solved in } \lambda \\
+		x'(0) = 0 & : \delta_{y(0)} \\
+		1 + x'(1) = 0 & : \delta_{y(1)} \\
+		z'(0) = 0 & : \delta_{z(0)} \\
+		z'(1) = 0 & : \delta_{z(1)} \\
+		x(1) = 2 & : \delta_\lambda
+	\end{cases} \]
+	
+
+\end{example}
 
 
-
-
-
-
+\section{The brachistochrone problem}
+	As saw at the first part of this chapter (page \pageref{sec:chfunctional}), functional minimization can be used to solve real problem. As example the brachistochrone problem wants to determine the path that minimize the time $T$ to reach point $B$ from a point $A$ for a mass $m$ subjected only to the force of gravity: this means minimizing the function
+	\[ T = \int_A^B \frac 1 v \, ds \]
+	where $v$ is the velocity of the point over the arc length $ds$. In order to describe the problem we consider $x$ as the horizontal axis and $y$ the vertical one (with positive direction the one \textit{facing upwards}); the point $A$ is described by the coordinates $(x_a,x_b) = (0,0)$ (so it's in the center of the reference system) while the point $B = (x_b,y_b)$ is placed anywhere in the lower semi-plane (in fact we must require that $y_b<0$ in order to have a free fall of the object). 
+	
+	Considering that at the initial position $A$ both the kinetic and potential energy are zero, due to the conservation of energy we can derive that
+	\[ 0 = mgy + \frac 1 2 m v^2 \qquad \Rightarrow \quad v = \sqrt{-2gy} \]
+	We so have the velocity $v$ as depending from the vertical coordinate $y$ of the point, and so the next step is to relate the arc length $ds$ with the horizontal variation $dx$: we can see that
+	\[ ds = \sqrt{dx^2 + dy^2} = \sqrt{dx^2 + y'^2(x)dx^2} = \sqrt{1 + y'^2} dx \] 
+	The initial brachistochrone problem can so be states as the following functional minimization problem:
+	\begin{align*}
+		\textrm{minimize:} \qquad & \fun F\big(y, y', x\big) = \int_{x_a = 0}^{x_b} \sqrt{\frac{1+y'^2}{-2gy}}\, dx \\
+		\textrm{subject to:} \qquad & y\big(x_a\big) = y_a = 0 \qquad y\big(x_b\big) = y_b < 0
+	\end{align*}
+	where the independent variable is the $x$ coordinate. Defined as $L(y,y',x) = \sqrt{\frac{1+y'^2}{-2gy}}$  the integral part of the target function to be minimized, we can convert the functional minimization to the following boundary value problem:
+	\[ \left\{ \begin{aligned}
+		&\pd L y - \frac d{dx} \pd L {y'} = -\frac{1+3 y'^2 + 2y'^4 - 2 y \, y''}{2\sqrt 2 g^2 y^3 \sqrt{\left(- \frac{1 + y'^2}{gy}\right)^3}} =  0 \\
+		&y(0) = 0 \\
+		&y(x_b) = y_b
+	\end{aligned} \right. \]
+	Even if it's not clear at first sight, it can be proven that the solution of the differential equation is a cycloid described by the equations
+	\[ x(\theta) = \frac 1 2 k^2 \big(\theta-\sin\theta\big) \qquad \qquad y(\theta) = \frac 1 2 k^2 \big(1-\cos\theta \big) \] 
+	where the constant $k$ and the range of the new angle $\theta$ of the parametrization can be found by using the boundary conditions; in particular the initial condition on points $A$ allows to state that $\theta_a = 0$ (in fact $x(0) = \frac 1 2 k^ 2 0 = 0$ and also $y(0) = 0$), while considering the final conditions we can determine both $\theta_b$ and $k$ solving this system of non-linear equation in such variables:
+	\[ \begin{cases}
+		x_b = \frac 1 2 k^2 \big(\theta_b - \sin\theta_b\big) \\
+		y_b = \frac 1 2 k^2 \big(1-\cos\theta_b\big)
+	\end{cases} \]
+	
+	
+	
+	
 
 
 

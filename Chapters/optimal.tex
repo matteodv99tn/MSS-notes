@@ -451,6 +451,49 @@ With that stated the boundary valued problem becomes similar to the formulation 
 	Some expression have been cancelled out because they are trivially solved for $\mu_i$.
 \end{example}
 
+\begin{example}{: free time problem, 2 controls}
+	Given the free time optimal control problem in the controls $u,w$ and states $x,y$
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^T \Big(x^2(t) + y^2(t)\Big) \, dt  \\
+		\textrm{subject to:} \qquad & x(t)' = y(t) u(t) \qquad y'(t) = x(t) + w(t) \\
+		& x(0) = 0 \qquad y(0) = 0 \qquad y(T) = 1 \\
+		& u(t),w(t) \in [-1,1]
+	\end{align*}
+	the first thing to find the solution is to transform the problem in fixed boundary optimal control problem by performing the change of variable $t = \zeta T$ (with $z\in [0,1]$) and so
+	\begin{align*}
+		\textrm{minimize:} \qquad & \int_0^1 T(\zeta)\Big(x^2(\zeta) + y^2(\zeta)\Big) \, d\zeta  \\
+		\textrm{subject to:} \qquad & x(\zeta)' = T(\zeta) y(\zeta) u(\zeta) \qquad y'(\zeta) = T(\zeta) \Big( x(\zeta) + w(\zeta) \Big) \qquad T'(\zeta) = 0 \\
+		& x(0) = 0 \qquad y(0) = 0 \qquad y(1) = 1 \\
+		& u(\zeta),w(\zeta) \in [-1,1]
+	\end{align*}
+	From now on all the functions will be represented as depending from the independent variable $\zeta$ and it won't be written any more. With that said we can compute the hamiltonian $\H$ and the utility function $\B$ of the problem as
+	\begin{align*}
+		\H\big(x,y,u,w, \lambda_1, \lambda_2, \lambda_3, T \big) & = T\big(x^2+y^2\big) + \lambda_1 T yu + \lambda_2 T\big(x+w\big) + 0\cdot\lambda_3  \\
+		\B\big(x_0,y_0,y_1, \mu_1, \mu_2, \mu_3\big)& =  \mu_1 x_0 + \mu_2 y_0 + \mu_3 \big(y_1-1\big)
+	\end{align*}
+	We that stated we can build the boundary value problem solution of the free time optimal control problem by adding at the initial ODEs and boundary conditions the the adjoint ones and the control law (related to Pontryagin minimum principle):
+	\[ \begin{cases}
+		x' = T y u \\ y ' = T (x+w) \\ T' = 0 \\ 
+		\lambda_1' = - \pd \H x = - 2xT - \lambda_2 T \\
+		\lambda_2' = - \pd \H y = -2Ty - \lambda_1 T u \\
+		\lambda_3' = - \pd \H T = -x^2 - y^2 - \lambda_1 yu - \lambda_2 (x+w) \\
+		x(0) = 0 \qquad y(0) = 0 \qquad y(1) = 1 \\
+		\lambda_1(1) = \lambda_3(0) = \lambda_3(1) = 0 \\
+		\pd \H u = \lambda_1 T y = 0 \\ \pd \H w = \lambda_2 T = 0 \\
+		u = \underset{\overline u \in [-1,1]}{\textrm{argmin}} \left\{ \lambda_1 T y \overline u  \right\} \\
+		w = \underset{\overline w \in [-1,1]}{\textrm{argmin}} \left\{ \lambda_2 T \overline w  \right\} 		
+	\end{cases} \] 
+	The solution of the control obtained by the Pontryagin principle becomes
+	\[ u(\zeta) = \begin{cases}
+		-1 \quad & \lambda_1 T y > 0 \\
+		1 \quad & \lambda_1 T y < 0 \\
+	\end{cases} \qquad \qquad \qquad w(\zeta) = \begin{cases}
+		-1 \quad & \lambda_2 T > 0 \\
+		1 \quad & \lambda_2 T < 0 \\
+	\end{cases} \]
+	The solution of the boundary value problem are in the independent variable $\zeta$, so to have the final solution in the time variable $t$ every control/state law must be evaluated in $t = \zeta T$ (where $T$ has been obtained by the solution of the boundary value problem).
+
+\end{example}
 
 
 

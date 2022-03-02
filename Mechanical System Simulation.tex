@@ -1,13 +1,10 @@
-\documentclass[10pt,letterpaper,twoside,openright]{book}
+\documentclass[10pt,letterpaper,oneside,openright]{book}
 
 \input{setup.tex}
 
 \usepackage[osf,sc]{mathpazo}
 \usepackage[scaled=0.90]{helvet}
 \usepackage[scaled=0.85]{beramono}
-
-%\usepackage[defaultfam,light,tabular,lining]{montserrat}
-%\renewcommand*\oldstylenums[1]{{\fontfamily{Montserrat-TOsF}\selectfont #1}}
 
 \begin{document}
 	
@@ -27,7 +24,7 @@
 		\vspace{2cm}
 		{\Large Department of Industrial Engineering} \\ \vspace{2mm}
 		{\LARGE \textbf{Mechatronic Systems Simulation}} \\ \vspace{2mm}
-		{\Large Prof.: Bertolazzi Enrico}\\
+		{\Large Prof.: Bertolazzi Enrico, Biral Francesco}\\
 		
 		\vspace{2cm}
 		{\LARGE \textbf{Course Notes}}
@@ -48,15 +45,20 @@
 	\tableofcontents
 	\mainmatter
 	
-	\part{Computational Method}
+%	\part{Computational Methods}
+%	
+%	\input{Chapters/laplace.tex}
+%	\input{Chapters/minimization.tex}	
+%	\input{Chapters/functionalminimization-v2.tex}
+%	\input{Chapters/optimal.tex}
 	
-	\input{Chapters/laplace.tex}
-	\input{Chapters/minimization.tex}	
-%	\input{Chapters/functionalminimization.tex}	
-	\input{Chapters/functionalminimization-v2.tex}
-	\input{Chapters/optimal.tex}
+	\part{Differential Algebraic Equations} \label{part:DAE}
+	\input{Chapters/ODE}
+	
+	\part{Modelling \& Simulation}
+	\input{Chapters/multidomain}
 	
 	\appendix
-	\input{Chapters/appendix.tex}
+%	\input{Chapters/appendix.tex}
 	
 \end{document}

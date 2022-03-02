@@ -1,0 +1,56 @@
+\chapter{Introduction}
+	\de{Mechatronics multi-body domain systems} \textbf{MBDS} are \textit{complex} systems that interacts and embeds \textbf{multiple physical domain}, such the thermal, controls, electrical, hydraulic...\\
+	Such system are intrinsically complex and their \de{modelling} and consequent \de{simulation} requires a high level of (mathematical) abstraction and modularisation; to improve the management of the model complexity it's necessary to decompose the initial MBDS into sub-system with low interaction with each other in order to focus independently on various aspect of the complex system.
+	
+	From a mathematical standpoint multi-body domain systems are usually described by \textbf{differential algebraic equations} DAE (described in part \ref{part:DAE}), a combination of ordinary differential and algebraic equations that can be used, as example, to perform \textbf{kinematic analysis} (to determine position/velocity/acceleration of components in the system) or \textbf{dynamic simulation} both off-line (to estimate the behaviour of the system) or online (with the \textbf{hardware in loop} HIL method allowing to control the mechatronic system).
+	
+	\paragraph{System modelling} The \de{model} is the process that, starting from real world observation, construct an \textbf{abstract representation} (mainly mathematical)  \textbf{validated} with physical experiments that allow to generate \textbf{simulations} in order to accomplish the \textbf{analysis} of the results obtained. The realisation of a model-based analysis of a mechatronic system's dynamic can per performed through this step:
+	\begin{itemize}
+		\item generate a qualitative system model in order to understand the general behaviour;
+		\item determine the domain specific models;
+		\item specify the mathematical dynamic of the models yet generated;
+		\item at this stage we so have a model that can predict the behaviour of real mechatronic systems.
+	\end{itemize}
+	
+	The modelling of the system can be performed using two types of approaches:
+	\begin{itemize}
+		\item the \textbf{qualitative} model is a \textit{black box} that for a given input determines an output; implementation of this modelling are \textbf{neural networks} that firstly need to be trained in order to predict the functionality of the system. It's proven in fact that any system can be described, within a certain accuracy range, by a proper neural network; the problem of this approach is that each time a parameter changes, the neural network must be re-trained and so it doesn't allow to state general assertion regarding the functionality of the multi-body system;
+		
+		\item a \textbf{quantitative} approach, based on differential algebraic equations, allows instead to have a more general meaning; the system is in fact described by a set of parameters, variables, equations and constraints that can somehow be symbolically manipulated or numerically solved.
+	\end{itemize}
+	
+	All models are so approximation of the real behaviour of the system and for that reason must be validated using experiments/testing and/or using the past experience gained; every model has a limited range of validity on which results are reliable within a certain standard. A good model must be \textit{simple} (it's useless to have an over-complex system to analyse every little detail) and captures the critical property of the system is modelling.
+	
+	Mathematical models can be \textit{small} or \textit{large}, \textit{simple} or \textit{complicated}, static or dynamic (regarding time-variant), deterministic or stochastic, qualitative or quantitative, linear or non-linear, continuous or discrete-time...\\
+	
+	\paragraph{Simulations} For the modelling and consequent simulation of multi-body systems several general-purpose simulation modelling and languages have been developed that can be classified according the following criteria:
+	\begin{itemize}
+		\item graph or language based;
+		\item procedural or declarative (based on equation) models;
+		\item multi or single-domain modelling respect to specific problem;
+		\item continuous or discrete (hybrid solutions also exists): this is related to the way on how subsystems of different domain interact together. In a \textbf{co-simulation} approach the communication interval between the system is discrete and introduces a delay between the system that can cause instability, while with a \textbf{unified} approach the solver solves the full set of equation simultaneously increasing accuracy/stability but also numerical complexity;
+		\item functional or object oriented.
+	\end{itemize}
+	
+	Usually a symbolic approach for the modelling is preferred because it allows to be \textit{more general}: we don't have to specify to the model what is the input and what's the output (that's instead decided at simulation time by reversing all relations) and allows to perform mathematical simplifications; usually for fast/real-time numerical simulation analytical formulas are converted in optimized \texttt C, \texttt{C++} code.
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

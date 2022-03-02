@@ -1,0 +1,136 @@
+\chapter{Final revision}
+\section{January 24, 2022}
+	Domande:
+	\begin{itemize}
+		\item parte A, domanda 6: perché sono sbagliate $h(x,y) = 0$ e $g(x,y)\geq 0$? Rispetto alle first order necessary condition.
+		
+		\item parte B, domanda 4: non mi risulta la ODE $x''-2x+\lambda = 1$ ma$-2x'' +2x - \lambda + 2$
+		
+		\item parte B, domanda 5: non mi risulta la ODE $2x-y''=0$ ma $2x-z-y''=0$; per quanto riguarda le condizioni al contorno non mi risulta $y'(0) = y(0)$ ma $y'(0) = 0$ e neanche non mi torna $x'(0) = x(0)$;
+		
+		\item parte B, domanda 7: ho sbagliato io
+		
+		\item parte B, domanda 8: non mi tornano le adjoint boundary conditions, dovrebbe esserci solo $\lambda_2(1) = 0$ (e non $\lambda_3(0) = \lambda_3(1) = 0$)
+	\end{itemize}
+
+\subsection*{Part B, question 4}
+	Given the problem
+	\begin{align*}
+		\textrm{minimize:} \qquad & \mathcal F(x) = x(0) + \int_0^1 \Big(x^2 + \big(x'-t\big)^2 \Big)\, dt \\
+		\textrm{subject to:} \qquad & \int_0^1 x\, dt = 0 \\ & x(1) = 2
+	\end{align*}
+	the related lagrangian is build as
+	\[ \lag(x,\lambda,\mu) = \int_0^1 \underbrace{\Big( x^2 + \big(x'-t\big)^2 - \lambda x\Big)}_{=L}\, dt + x(0) - \mu \big(x(1)-2\big) \]
+	It's first variation can be regarded as
+	\begin{align*}
+		\delta \lag & = \int_0^1 \Big( \big(2x - \lambda\big) \delta_x - 2\big(x'-t\big) \delta_{x'} \Big) \, dt - \int_0^1 x\,\delta_\lambda\, dt + \delta_{x(0)} - \mu \delta_{x(1)} - \big(x(1)-2\big) \delta_\mu \\
+		& = \int_0^1 \left( \pd L x - \frac d {dt} \pd L{x'}\right) \delta_x\, dt + \left[\pd L{x'} \delta_x\right]_0^1  - \int_0^1 x\,\delta_\lambda\, dt + \delta_{x(0)} - \mu \delta_{x(1)} - \big(x(1)-2\big) \delta_\mu 
+	\end{align*}
+	Considering that $\pd L x = 2x- \lambda$, $\pd L{x'} = 2(x'-t)$ and so $\frac d{dt}\pd L{x'} = 2x''- 2$ we can explicit the variation as
+	\begin{align*}
+		\delta \lag = &\ \int_0^1 \big( 2x - \lambda -2x''+2  \big) \delta_x \, dt + 2\big(x'(1) - 1\big) \delta_{x(1)} - 2 x'(0) \delta_{x(0)} - \int_0^1 x\,\delta_\lambda\, dt \\ & + \delta_{x(0)} - \mu \delta_{x(1)} - \big(x(1)-2\big) \delta_\mu
+	\end{align*}
+	The resulting boundary value problem, solution of the functional minimization, can be obtained by setting to zero the terms related to each variation $\delta_\cdot$:
+	\[ \begin{cases}
+		2x - \lambda - 2x'' + 2 = 0 & : \delta_x \\
+		1-2x'(0) = 0 & : \delta_{x(0)} \\
+		\cancel{2x'(1) -2 - \mu = 0 } & : \delta_{x(1)} \quad \textrm{ trivially solved} \\
+		x(1) = 2 & :\delta_\mu \\
+		\int_0^1 x\, dt = 0 &: \delta_\lambda
+	\end{cases} \]
+
+\subsection*{Part B, question 5}
+	Given the problem
+	\begin{align*}
+		\textrm{minimize:} \qquad & \mathcal F(x,y,z) = z(0) + \int_0^1 \Big(x^2 + xz +z'^2 + x'y'\Big)\, dt \\
+		\textrm{subject to:} \qquad & z(1) = 2 \qquad y(0) = 1
+	\end{align*}
+	the differential equations managing the boundary value problem are based on the integral part of $\mathcal F$, so on $L(x,y,z) = x^2 + xz + z'^2 + x'y'$. In particular we have
+	\begin{align*}
+		\pd L x - \frac d{dt}\pd L{x'} & = 2x - z - \frac d{dt}\big(y'\big)= && 2x - z - y'' = 0 \\
+		\pd L y - \frac d{dt}\pd L{y'} & = 0 - \frac d{dt}\big(x'\big) =&& x'' = 0 \\
+		\pd L z - \frac d{dt}\pd L{z'} & = x - \frac d{dt}\big(2z'\big) =&& x - 2 z'' = 0 \\
+	\end{align*}
+	To determine the other boundary condition is necessary to compute the first variation of the lagrangian $\lag(x,y,z,\mu_1,\mu_2) = \mathcal F - \mu_1(z(1)-2) - \mu_2(y(0)-1)$ that's
+	\begin{align*}
+		\delta \lag = & \ \int_0^1 \dots\, dt + \left[\pd L {x'} \delta_x\right]_0^1 + \left[\pd L {y'} \delta_y\right]_0^1 + \left[\pd L {z'} \delta_z\right]_0^1  \\ & + \delta_{z(0)} - \mu_1 \delta_{z(1)} - \big(z(1)-2\big) \delta_{\mu_1} - \mu_2 \delta_{y(0)} - \big(y(0) - 1\big) \delta_{\mu_2} \\
+		= & \ \int_0^1 \dots \, dt + y'(1) \delta_{x(1)} - y'(0)\delta_{x(0)} + x'(1) \delta_{y(1)} - x'(0) \delta_{y(0)} + 2z'(1)\delta_{z(1)} - 2z'(0) \delta_{z(0)}\\ & + \delta_{z(0)} - \mu_1 \delta_{z(1)} - \big(z(1)-2\big) \delta_{\mu_1} - \mu_2 \delta_{y(0)} - \big(y(0) - 1\big) \delta_{\mu_2} \\ 
+	\end{align*}
+	The boundary condition of the boundary value problem can be so obtained by setting equal to zero the terms related to each variation at the extremas, so:
+	\begin{align*}
+		\delta_{x(0)}: \quad & y'(0) = 0 \qquad & \delta_{x(1)}:& \quad  y'(1) = 0\\
+		\delta_{y(0)}: \quad & \cancel{x'(0)+\mu_2 = 0} \qquad & \delta_{y(1)}:& \quad  x'(1) = 0 \\
+		\delta_{z(0)}: \quad & 1 - 2z'(0) = 0 \qquad & \delta_{z(1)}:& \quad  \cancel{2z'(1)-\mu_2 = 0 } \\
+		\delta_{\mu_1}: \quad & z(1) - 2 = 0 \qquad & \delta_{\mu_2}:& \quad  y(0) - 1 = 0 
+	\end{align*}
+
+
+\subsection*{Part B, question 7}
+	Given the optimal control problem
+	\begin{align*}
+		\textrm{minimize:} \qquad & x(0) + \int_0^1 xu\, dt \\
+		\textrm{subject to:} \qquad & x' =  y- u \qquad y' = xu \\
+		& x(1) = 2 \\
+		& u(t) \in [-2,1]
+	\end{align*}
+	the associated hamiltonian $\H$ and utility function $\B$ are
+	\begin{align*}
+		\H\big(x,y,u,\lambda_1,\lambda_2\big) & = xu + \lambda_1\big(y-u\big) + \lambda_2 xu \\
+		\B(x_0,x_1,\mu) & = x_0 + \mu \big(x_1-2\big)
+	\end{align*}
+	The co-equation are computed directly from the hamiltonian as
+	\begin{align*}
+		\lambda_1' & = - \pd \H x = - \big(u + \lambda_2 u\big) \\
+		\lambda_2' & = - \pd \H y = - \lambda_1
+	\end{align*}
+	The control law can be obtained by the Pontryagin minimum principle, so determining the controls $u$ in it's domain that minimize the function $\tilde H = xu - \lambda_1 u + \lambda_2 xu$:
+	\[ u(t) = \underset{\overline{ u} \in \mathcal [-2,1]}{\textrm{argmin}} \left\{ \overline u\big( x - \lambda_1 + \lambda_2 x\big) \right\} = \begin{cases}
+		-2 \quad & \textrm{if } x - \lambda_1 + \lambda_2 x > 0 \\
+		1 & \textrm{if } x - \lambda_1 + \lambda_2 x < 0 
+	\end{cases} \]
+	The adjoint boundary conditions are instead dependent on the utility function $\B$, in particular
+	\begin{align*}
+		\lambda_1(0) = -\pd \B {x_0} = - 1 \qquad \lambda_2(0) = - \pd \B{y_0} = 0 \qquad \lambda_2(1) = \pd \B{y_1} = 0
+	\end{align*}
+
+
+\subsection*{Part B, question 8}
+	Given the optimal control problem
+	\begin{align*}
+		\textrm{minimize:} \qquad & x(1) + 2 y(0) + \int_0^1 \big(1+x+y\big) u^2\, dt \\
+		\textrm{subject to:} \qquad & x' =  y \qquad y' = x+u \\
+		& \int_0^1 \big(x+u^2\big)\, dt = 2 \\
+		& x(0) = 1 \qquad x(1) = 2 \qquad y(0) = 2 
+	\end{align*}	
+	the first thing is to get rid of the integral constraint by adding a new state $z$ whose differential equation is $z' = x + u^2$ and bounded with $z(0) = 0$ and $z(1) = 2$:
+	\begin{align*}
+		\textrm{minimize:} \qquad & x(1) + 2 y(0) + \int_0^1 \big(1+x+y\big) u^2\, dt \\
+		\textrm{subject to:} \qquad & x' =  y \qquad y' = x+u \qquad z' = x+u^2 \\
+		& x(0) = 1 \qquad x(1) = 2 \qquad y(0) = 2  \qquad z(0) = 0 \qquad z(1) = 2
+	\end{align*}	
+	With that problem as here presented, the hamiltonian $\H$ and the utility function $\B$ are so
+	\begin{align*}
+		\H\big(x,y,z, u,\lambda_1,\lambda_2,\lambda_3\big)  = & \ \big(1+x+y\big)u^2 + \lambda_1 y + \lambda_2(x+u) + \lambda_3\big(x+u^2\big) \\
+		\B\big(x_0,x_1,y_0,z_0,z_1,\mu_1,\mu_2, \mu_3, \mu_4, \mu_5\big)  = & \ x_1 + 2 y_0 + \mu_1\big(x_0-1\big) + \mu_2 \big(x_1-2\big) + \mu_3 \big(y_0-2\big) \\ & + \mu_4 z_0 + \mu_5 \big(z_1-2\big)
+	\end{align*}
+	Using the Pontryagin maximum principle, we know that the hamiltonian must be stationary respect to the chosen control so
+	\[ \pd \H u = 2u(1+x+y) + \lambda_2 + 2 u \lambda_3 = 0  \]
+	and inverting to explicit the control
+	\[ u(t) = - \frac{\lambda_2(t)}{2 \big(1+x(t)+y(t) + \lambda_3(t)\big)} \]
+	The adjoint equations are
+	\begin{align*}
+		\lambda_1' & = - \pd \H x = - \big( u^2 + \lambda_2 + \lambda_3 \big) \\
+		\lambda_2' & = - \pd \H y = - \big( u^2 + \lambda_1 \big) \\
+		\lambda_3' & = - \pd \H z = 0 
+	\end{align*}
+	with adjoint boundary conditions
+	\begin{align*}
+		& \cancel{\lambda_1(0) = - \pd \B{x_0} = -\mu_1} \qquad && \cancel{\lambda_1(1) =  \pd \B {x_1} =  1 + \mu_2} \\
+		& \cancel{\lambda_2(0) = - \pd \B{y_0} = -2-\mu_3} \qquad && \lambda_2(1) =  \pd \B {y_1} = 0 \\
+		& \cancel{\lambda_3(0) = - \pd \B{z_0} = -\mu_4} \qquad && \cancel{\lambda_3(1) =  \pd \B {z_1} = \mu_5} \\
+	\end{align*}
+
+
+
+
+

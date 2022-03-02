@@ -1,0 +1,190 @@
+\chapter{Ordinary Differential Equations}
+	To start the description of the \de{differential algebraic equations}\textbf{DAEs} it's firstly necessary to recall what \de{ordinary differential equations} \textbf{ODEs} are, what they mean and how to solve them.
+	
+	In particular ordinary differential equations is a particular equation that involves a function (for example $y(x)$ depending from the independent variable $x$) and it's derivative as shown in this example:
+	\[ y''(x) + x y'(x) + y(x) = \sin x \qquad \leftrightarrow \qquad y'' + xy' + y = \sin x \]
+	
+	Ordinary differential equations (or system of ODEs) can be written in a \de{\textit{standard form}} made by the \textbf{differential part}, where the first derivative is a function of itself, and the \textbf{initial condition} that set a specified value of the solution of the problem:
+	\begin{equation}
+	\begin{cases}
+		y' = f\big(x,y(x)\big) = f(x,y) \qquad & \text{: differential part} \\
+		y(a) = y_a & \text{: initial condition}
+	\end{cases}
+	\end{equation}
+	Initial conditions are mandatory: the solution of the differential part lonely gives a \textit{family} of solutions (parametric results) whose specific value can be determined only by knowing the value of the function at certain time. Considering the simple case of the differential $x' = 0$ with independent variable $t$, then the general solution is the class of all the constant functions $x(t) = c$ (with $c\in \mathds R$). If a boundary condition is set (example $x(1) = 3$) then we can chose the particular solution (in this case $c = 3$ and so $x(t) = 3$).
+	
+	Ordinary differential equations can also come in system as in the following example (with $t$ as dependent variable) composed by 2 differential and 2 initial condition terms:
+	\[\begin{cases}
+		x' = x + y \\ y' = e^x-y \\ x(0) = 0 \\ y(0) = 1
+	\end{cases}\]
+	
+	\paragraph{Vectorial notation} Considering the system of $n=3$ differential equation depending from the independent variable $t$ in the form
+	\[ \begin{cases}
+		z'(t) = x(t) + z(t) \\ w'(t) = z(t) \\ x'(t) = w(t)z(t) + t(t) \\ x(0) = w(0) = z(0) = 1
+	\end{cases} \]
+	then it can be rewritten in a vectorial form; considering in fact the substitutions $x(t) = y_1(t)$, $w(t) = y_2(t)$ and $z(t) = y_3(t)$ we have obtain the system
+	\[ \begin{cases}
+		y_3' = y_1 + y_3 \\
+		y_2' = y_3 \\ 
+		y_1' = y_2y_3 + t \\ y_1(0) = y_2(0) = y_3(0) = 1
+	\end{cases} \qquad \Rightarrow \qquad \begin{cases}
+		y_1' = y_2y_3 + t \\
+		y_2' = y_3 \\  
+		y_3' = y_1 + y_3 \\
+		y_1(0) = y_2(0) = y_3(0) = 1
+	\end{cases}\]
+	Considering the vector $\vett y = (y_1,y_2, y_3)$ we can so rewrite the original system of ODEs as
+	\begin{equation}
+		\begin{cases}
+			\vett y' = \vett f \big(t, \vett y\big) \\ \vett y(0) = \vett 1
+		\end{cases}
+	\end{equation}
+	where
+	\[ \vett f : \mathds R^{n+1} \rightarrow \mathds R^n = \begin{pmatrix}
+		y_2 y_3 + t \\ y_3 \\ y_1 + y_3
+	\end{pmatrix} \]
+	In this case the domain of the function $\vett f$ is a vector of dimension $n+1$: $n$ related to the number of ODEs and 1 for the time dependency.
+	
+	\paragraph{Order of an ODE} The \de{order} of an ordinary differential equation is equal to the maximum order derivative appearing in the differential part of the system; considering as example
+	\[ \begin{cases}
+		y'' + y' + z' = 0 \\ z' + t = 0
+	\end{cases} \]
+	the order of such ordinary differential system is equal to 2 (associated to the term $y''$). 
+	
+	In general numerical methods are defined for 1$^{st}$ order ODEs and so it's necessary (but most importantly possible) to convert any generic differential equation into a system of 1$^{st}$ order ODEs by performing a change of variable.
+	
+	\begin{example}{: reduction to a system of ODEs of first order}
+		Given the system of ODEs of the 3$^{rd}$ order in the independent variable $t$ defined as
+		\[ \begin{cases}
+			x''' + y' = x^2 + t \\ 
+			y'' + x = t^2 + 1 \\
+			x(0) = 0 \qquad y(0) = 0 \\
+			x'(0) = 0 \qquad y'(0) = 2 \\
+			x''(0) = 2
+		\end{cases} \]
+		the reduction to a system of first order ODEs is made by introducing the variable $z = x'$; defining instead the function $x'' = z' = w$ we also have that $z' = w$ hence $x''' =z'' = w'$; finally we can set $y' = p$ hence $y'' = p$. The system so becomes
+		\[ \begin{cases}
+			w' + p = x^2 + t \\ 
+			p' + x = t^2 + 1 \\
+			x' = z \\ 
+			z' = w \\
+			y' = p \\
+			x(0) = 0 \qquad y(0) = 0 \\
+			z(0) = 0 \qquad p(0) = 2 \\
+			w(0) = 2
+		\end{cases} \]
+		This system present 3 more differential terms and so seems \textit{more difficult}, however this formulation is numerically more suitable for the computation.
+	\end{example}
+	
+\section{Existence of the solution}
+	Given the general system of $n$ ordinary differential equations in the standard form
+	\[ \begin{cases}
+		\vett y' = \vett f\big(t,\vett y\big) \\ \vett y(a) = \vett y_a
+	\end{cases} \]
+	using \textbf{Peano's theorem} we can state that if the vectorial map $\vett f: \mathds R^{n+1} \rightarrow \R^n$ is continuous, then a solution exists in the neighbourhood of the point $(t=a,\vett y = \vett y_a)$. This theorem provide a sufficient condition to determine if a solution exists, but it doesn't state that the solution is unique.
+	
+	\begin{example}{: ODE with multiple solution} \label{ex:ode:multisol}
+		Considering the ordinary differential equation in the independent variable $t$
+		\[ \begin{cases}
+			y' = \sqrt{|y|} \\ y(0) = 0
+		\end{cases} \]
+		we can see that the map $f(y) = \sqrt{|y|}$ is continuous for all $y\in \R$, hence for Peano's theorem a solution must exists for $t$ \textit{sufficiently close} to $0$. In particular we can observe that the function
+		\[y(t) = 0 \]
+		is a solution of the system, in fact it matches the initial condition and we have that it's derivative $y' = \frac{dy}{dt} = 0$ is equal to the function $f(y) = \sqrt{|0|} = 0$.
+		
+		However this is not the lonely solution, considering in fact the function
+		\[ y(t) = \frac{t^2}{4} \textrm{sign}(t) = \begin{cases}
+			\frac{t^2}4 \qquad & t \geq 0 \\
+			-\frac{t^2}4 & t < 0
+		\end{cases} \]
+		Observing that the derivative of such function can be regarded as
+		\[ y'(t) = \begin{cases}
+			\frac{t}4 \qquad & t \geq 0 \\
+			-\frac{t}2 & t < 0
+		\end{cases} \qquad \Rightarrow \quad y'(t) = \frac{|t|}{2} \]
+		we can also check that the provided solution solves the differential part of the system, in fact
+		\[ \sqrt{|y(t)|} = \sqrt{\left| \frac{t^2}{4} \textrm{sign}(t) \right|} = \sqrt{\frac{t^2}{4}} = \frac{|t|}{2} = y'(t) \]
+	\end{example}
+	In general when solving system of differential equation we want to be sure that the solution exists (using as example Peano's theorem) but that is also unique. In order to do so we have to defined the \textbf{Lipschitz continuity}:
+	\begin{equation} \label{eq:ode:lipschitz}
+		f:\R^n\rightarrow \R \textrm{ is Lip. cont.} \quad \textrm{if } \exists L \in \mathds R \quad \textrm{such that} \quad \big\| f(\vett x) - f(\vett y) \big\| \leq L\big\|\vett x - \vett y\big\| \qquad \forall \vett x,\vett y \in \mathds R 
+	\end{equation}
+	We can so state that a system of ordinary differential equation in the standard form has one solution if the map $\vett f:\R^{n+1}\rightarrow \R^n$ is continuous (from Peano) and is also lipschitzian.
+	
+	\begin{example}{: Lipschitz continuity}
+		Considering the problem of example \ref{ex:ode:multisol} we can prove that the system has multiple solution by checking that's not Lipschitz continuous. Known that the map $f(t,y):= \sqrt{|y|}$ is continuous we can apply Lipschitz definition in the particular case when one point is the origin of the the axis:
+		\begin{align*}
+			\big| f(0,y) - f(0,0)\big| & \leq L\big|x-0\big| \\
+			\left| \sqrt{|y|} - \sqrt{|0|} \right| & L  \leq |y| \\
+			\cancel{\sqrt{|y|}} & \leq L \cancel{\sqrt{|y|}} \sqrt{|y|} \\
+			L & \geq \frac 1{\sqrt{|y|}}
+		\end{align*}
+		Observing that for $y\rightarrow 0$ the denominator converges to zero this means that $L$ must diverge to $\infty$ meaning that the function is not lipschitzian: the solution exists (Peano's theorem) but it might not unique (for Lipschitz).
+	\end{example}
+
+\section{Taylor expansion}
+	The main tool used for numerical approximate solution of (system of) ordinary differential equation is the \de{Taylor series expansion} that's used to approximate a function $f:\R\rightarrow \R$ of class $\mathcal C^\infty$ as a polynomial in the neighbourhood of a specific point $x_0$; given $h$ as the deviation from the point $x_0$ for \textit{small} values of $h$ we can approximate the function
+	\begin{equation} \label{eq:ode:taylorgeneric}
+	\begin{split}
+		f\big(x_0 + h\big) & \approx a_0 + a_1 h + a_2 h^2 + a_3 h^3 + \dots + a_n h^n \\
+		& \approx a_0 + \sum_{k=1}^\infty a_k h^k
+	\end{split} 
+	\end{equation}
+	
+	Evaluating both members allows to obtain the first coefficient $a_0 =f(x_0)$ of the Taylor expansion, in fact
+	\[ f\big(x_0\big) = a_0 + \sum_{k=1}^\infty a_k 0^k = a_0  \]
+	By differentiation we can also obtain other coefficients
+	\begin{align*}
+		f'(x_0+h) & = a_1 + \sum_{k=2}^\infty a_k h^{k-1}k \qquad && \xrightarrow{h = 0} \qquad a_1 = f'(x_0) \\
+		f''(x_0+h) & = 2a_2 + \sum_{k=3}^\infty a_k h^{k-2}k(k-1) \qquad && \xrightarrow{h = 0} \qquad 2a_2 = f''(x_0) \\
+	\end{align*}
+	Considering that in general each coefficient can be computed as $a_k = f^{(k)}(x_0) / k!$ we can better rewrite the Taylor series expansion of equation \ref{eq:ode:taylorgeneric} as
+	\begin{equation}
+		f\big(x_0 + h\big) \approx \sum_{k=0}^{\infty} \frac{f^{(k)}(x_0)}{k!} h^k
+	\end{equation}
+	
+	\paragraph{Truncation} From a numerical standpoint the computation of the Taylor series is truncated to a order $n$ and so we can use the formulation
+	\begin{equation}
+		f\big(x_0 + h\big) = \sum_{k=0}^{n} \frac{f^{(k)}(x_0)}{k!} h^k + R_n(h)
+	\end{equation}
+	where $R_n$ is the reminder due to the truncation of the series that can be evaluated in multiple ways:
+	\begin{itemize}
+		\item using Peano's formulation the more formal definition of the reminder is
+		\[ R_n(h) = \int_{x_0}^{x_0+h} f^{(n+1)} (s) \frac{(s-h)^n}{n!}\, ds\]
+		This formulation is still complex and numerically \textit{unusable};
+		\item the Lagrange reminder in the form
+		\[ R_n(h) = f^{(n+1)}(\zeta) \frac{h^{n+1}}{(n+1)!} \qquad \textrm{with } \zeta \in \big( x_0,x_0+h \big) \]
+		\item the \textit{big O} notation $R_n(h) = \mathcal O\big(h^{n+1}\big)$; in particular we denote $g(x) = \mathcal O\big(f(x)\big)$ if 
+		\[ \exists C \in \R \quad \textrm{such that} \quad |g(x)| \leq C|f(x)| \]
+		\item the \textit{small o} notation $R_n(h) = o\big(h^n\big)$; we say that $g(x) = o\big(f(x)\big)$ if $f$ is lipschitzian (equation \ref{eq:ode:lipschitz}) and we have that
+		\[ \lim_{x\rightarrow 0} \frac{o\big(f(x)\big)}{g(x)} = 0 \]
+	\end{itemize}
+	
+	\paragraph{Common Taylor expansions}Examples of notable series expansion on the point $x_0 = 0$ for well-known functions are the exponential, the cosine and sine:
+	\begin{equation}
+	\begin{split}
+		e^h & = \sum_{k=0}^\infty \frac{h^k}{k!} = 1 + h + \frac{h^2}{2} + \frac{h^3}{3!} + \frac{h^4}{4!} + \dots \\
+		\cos h & = \sum_{k=0}^{\infty} -1^{k} \frac{h^{2k}}{2k!} = 1 - \frac{h^2}{2!} + \frac{h^4}{4!} - \frac{h^6}{6!} + \dots \\
+		\sin h & = \sum_{k=0}^{\infty} -1^{k} \frac{h^{2k+1}}{(2k+1)!} = h - \frac{h^3}{3!} + \frac{h^5}{5!} - \frac{h^7}{7!} + \dots
+	\end{split}
+	\end{equation}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
