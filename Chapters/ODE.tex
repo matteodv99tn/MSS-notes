@@ -1,11 +1,11 @@
-\chapter{Ordinary Differential Equations}
+\chapter{Ordinary Differential Equations and Numerical Solutions}
 	To start the description of the \de{differential algebraic equations}\textbf{DAEs} it's firstly necessary to recall what \de{ordinary differential equations} \textbf{ODEs} are, what they mean and how to solve them.
 	
 	In particular ordinary differential equations is a particular equation that involves a function (for example $y(x)$ depending from the independent variable $x$) and it's derivative as shown in this example:
 	\[ y''(x) + x y'(x) + y(x) = \sin x \qquad \leftrightarrow \qquad y'' + xy' + y = \sin x \]
 	
 	Ordinary differential equations (or system of ODEs) can be written in a \de{\textit{standard form}} made by the \textbf{differential part}, where the first derivative is a function of itself, and the \textbf{initial condition} that set a specified value of the solution of the problem:
-	\begin{equation}
+	\begin{equation} \label{eq:ode:temp1}
 	\begin{cases}
 		y' = f\big(x,y(x)\big) = f(x,y) \qquad & \text{: differential part} \\
 		y(a) = y_a & \text{: initial condition}
@@ -139,7 +139,7 @@
 		f''(x_0+h) & = 2a_2 + \sum_{k=3}^\infty a_k h^{k-2}k(k-1) \qquad && \xrightarrow{h = 0} \qquad 2a_2 = f''(x_0) \\
 	\end{align*}
 	Considering that in general each coefficient can be computed as $a_k = f^{(k)}(x_0) / k!$ we can better rewrite the Taylor series expansion of equation \ref{eq:ode:taylorgeneric} as
-	\begin{equation}
+	\begin{equation} \label{eq:ode:taylor}
 		f\big(x_0 + h\big) \approx \sum_{k=0}^{\infty} \frac{f^{(k)}(x_0)}{k!} h^k
 	\end{equation}
 	
@@ -168,6 +168,129 @@
 		\sin h & = \sum_{k=0}^{\infty} -1^{k} \frac{h^{2k+1}}{(2k+1)!} = h - \frac{h^3}{3!} + \frac{h^5}{5!} - \frac{h^7}{7!} + \dots
 	\end{split}
 	\end{equation}
+	
+	\paragraph{Existence of the expansion} Considering the definition of the lagrangian reminder in the form $f^{(m)}(\zeta) \frac{h^m}{m!}$ if we truncate the series to higher order (bigger value of $m$) we observe that for $h <1$ the term $h^m/m!$ tends to zero, and so if we ensure that the $m$-th derivative doesn't diverge we have that the Taylor series converge to the \textit{real} function. However this sometimes can fail: considering as example the function
+	\[ f(x) = \begin{cases}
+		e^{-\frac 1 {x^2}} \qquad & x> 0 \\ 0 & \textrm{otherwise}
+	\end{cases} \]
+	it's proven that the function is \textit{smooth} ($f\in C^\infty$) and that the $k$-th derivative is in the form
+	\[ \left(e^{-\frac 1 {x^2}}\right)^{(k)} = e^{-\frac 1 {x^2}} \frac{p_1(x)}{p_2(x)} \hspace{2cm} p_1,p_2 \textrm{ polynomials} \]
+	and converges to zero for $x\rightarrow 0$. By applying the definition of the Taylor expansion in $x_0=0$ we so have that
+	\[ f(0+h) = \sum_{k=0}^\infty f^{(k)}(0) \frac{h^k}{k!} = 0 \]
+	This expansion correctly models the left-hand side of the function $f$ but not the right side, and so the Taylor expansion fails.
+	
+\subsection{Multi-variable functions}
+	Until now we have defined the Taylor expansion of function with one variable in the form $f(x)$, but such concept should be extended to function of multiple variables. Considering the simple case of $f:\R^2\rightarrow \R$ in order to perform the Taylor series we have to ensure a continuity up to an order $m$ for the function, meaning 
+	\begin{equation}
+		f(x,y) \in C^m \hspace{1.4cm} \Leftrightarrow \hspace{1.4cm} \frac{\partial^{i+j}}{\partial x^i \partial y^j} f(x,y) \in C \quad \forall i+j \leq m
+	\end{equation}
+	
+	We have the formal definition of the Taylor series for functions of one variable (equation \ref{eq:ode:taylor}) and so, as idea, we can \textit{slice} the function $f$ passing through a point $(x_0,y_0)$ with a direction $(x-x_0,y-y_0) = (d_x,d_y)$ using a function
+	\[ g(t) = f(x_0 + td_x,y_0 + td_y) \]
+	The idea is so to compute the Taylor series of this function in the neighbourhood of $t = 0$:
+	\[ g(t) = g(0) + g'(t) t + g''(0) \frac{t^2}{2!} + g'''(0) \frac{t^3}{3!} +  \dots \]
+	The term $g'(t)$relates to the total derivative of $f(x_0 + t d_x, y_0 + t d_y)$ respect to the variable $t$, meaning that
+	\begin{align*}
+		g'(t) & = \frac{d}{dt} f\big(x_0 + t\, d_x, y_0 + t\, d_y\big) \\
+		& = \pd {f(\dots)} x \frac{d(x_0+t\, d_x)}{dt} + \pd {f(\dots)} y \frac{d(y_0+t\, d_y)}{dt} \\
+		& = \pd{f(\dots)}{x} d_x + \pd{f(\dots)}{y} d_y = \pd{f(\dots)}{x} (x-x_0) + \pd{f(\dots)}{y} (y-y_0) \\
+		g'(0) & = \pd {f(x_0,y_0)}{x}(x-x_0) + \pd {f(x_0,y_0)}{y}(y-y_0)
+	\end{align*}
+	Using a similar methodology it's possible to compute the second order derivative of $g$ as
+	\begin{align*}
+		g''(t) & = \frac d{dt}g'(t) = \frac{d}{dt} \left( \pd{f(\dots)}{x} (x-x_0) + \pd{f(\dots)}{y} (y-y_0) \right) \\
+		& = \frac{\partial^2 f(\dots)}{\partial x^2} (x-x_0)^2 + \frac{\partial^2 f(\dots)}{\partial y^2} (y-y_0)^2 + 2 \frac{\partial^2 f(\dots)}{\partial x \, \partial y} (x-x_0)(y-y_0)
+	\end{align*}
+	
+	Considering as more general statement to express the Taylor series respect to a point $(x_0,y_0)$ moving with values $h = td_x$ and $k = t d_y$ the series truncated to the second order is so
+	\begin{equation}
+	\begin{split}
+		f(x_0 + h, y_0 + k) = & f(x_0,y_0)  + \left. \pd f x\right|_{(x_0,y_0)} h + \left. \pd f y\right|_{(x_0,y_0)} k  \\ & + \frac 1 2 \left.  \frac{\partial^2 f}{\partial x^2} \right|_{(x_0,y_0)} h^2 + \frac 1 2 \left.  \frac{\partial^2 f}{\partial y^2} \right|_{(x_0,y_0)} k^2 + \left.  \frac{\partial^2 f}{\partial x \,\partial y} \right|_{(x_0,y_0)} hk
+	\end{split}
+	\end{equation}
+	This representation can be compacted using a vectorial/matrix notation condensing $(x_0,y_0)$ in the vector $\vett x_0$ and the increment $(h,k) = \vett h$ we can define
+	\begin{equation}
+		f (\vett x_0 + \vett h) = f(\vett x_0) + \nabla f(\vett x_0)\, \vett h + \frac 12 \vett h^t \, \nabla^2 f(\vett x_0)\, \vett h + R_3(\|\vett h\|)
+	\end{equation}
+	where $\nabla f(\vett x) = (\pd f {x_1}, \dots, \pd f {x_n})$ is the \textbf{gradient} of the function (and is a row vector) and $\nabla^2f(\vett x)$ is the \textbf{hessian matrix} of $f$. Note that this formulation is general and is valid for any multi-variable function $f:\R^n\rightarrow \R$ assuming that's at least $C^2$.
+	
+	\paragraph{Higher order Taylor expansion} In order to perform Taylor expansion with order greater than 2 it's necessary to use a \textbf{tensor} notation; in particular the expansion of a function $f:\R^n\rightarrow \R$ up to the order $m$ is described by the equation
+	\begin{equation}
+		f\big(\vett x_0 + \vett h\big) = \sum_{k=0}^{m} \sum_{|\alpha|=k} \partial_\alpha f(\vett x_0) \frac{\vett h^\alpha}{\alpha!} + R_m
+	\end{equation}
+	where $\alpha = (\alpha_1,\alpha_2,\dots,\alpha_n)$ is the multi-index vector that consists of non-negative integers; the condition $|\alpha|=k$ based on the norm $|\alpha| = \alpha_1+\alpha_2+\dots + \alpha_n$ choses all combination of $\alpha$ satisfying such relation and the multi-index variable is used for the computation following the expressions
+	\[ \partial_\alpha := \partial_{x_1}^{\alpha_1} \partial_{x_2}^{\alpha_2} \dots \partial_{x_n}^{\alpha_n} f\vett(x) \hspace{2cm} \vett h^\alpha := h_1^{\alpha_1} h_2^{\alpha_2} \dots h_n^{\alpha_n} \]
+	
+\section{Numerical methods based on the Taylor series}
+	In practise (systems of) ordinary  differential equations are numerically solved by computes using algorithms some of which are based on the Taylor series expansion. Considering for the simplicity a first order ordinary differential equation in the standard form (equation \ref{eq:ode:temp1})
+	\[ \begin{cases}
+		y' = f(x,y) \\ y(a) = y_a
+	\end{cases} \]
+	If we consider $y(x)$ the solution of the ODE system, that can be expanded up to the second order with Taylor as
+	\[ y(x+h) = y(x) + y'(x) h + \mathcal O (h^2) = y(x) + f(x,y) h + \mathcal O (h^2) \]
+	The most basic idea to numerically compute the solution is to subdivide the interval $[a,b]$ of integration into $N$ pieces having each a width $h = \frac{b-a}{N}$; this discretization of the $x$ axis determines so the sequence of point $x_k = a + h k$. With this idea in mind we can see that the yet computed Taylor expansion can be regarded as
+	\begin{equation} \label{eq:ode:temp2}
+		y(x_{k+1}) = y(x_k) + f\big(x_k, y(x_k)\big) h + \mathcal O(h^2)
+	\end{equation}
+	Numerical methods determines a sequence of output $y_k$ that tends to approximate the real behaviour of the solution, hence $y_k \approx y(x_k)$. The simplest numerical method to solve the ordinary differential equation is by simply using  equation \ref{eq:ode:temp2} neglecting the reminder:
+	\begin{equation} \label{eq:ode:expliciteuler}
+		y_{k+1} = y_k + f(x_k,y_k) h 
+	\end{equation}
+	
+	\paragraph{Error} Numerical methods are approximation of the analytical solutions, hence intrinsically contains an error that should be somehow defined in order to determine \textit{how bad} or \textit{good} the numerical solution is. If we new define the error $\epsilon_k$ on the $k$-th step as the difference between the analytical and numerical solution
+	\begin{equation} \label{eq:ode:temp3}
+		\varepsilon_{k+1}  = y(x_{k+1}) - y_{k+1} = y(x_k) - y_k + \Big( f\big(x_k, y(x_k)\big) - f(x_k,y_k) \Big) h + \frac{y''(\zeta_k)}{2} h^2 
+	\end{equation}
+	where the reminder $\mathcal O(h^2)$ as been substituted with the lagrangian one and hence $\zeta_k \in (x_k,x_{k+1})$. Considering that the function $f$ is assumed to be lipschitzian, then it means that exists $L\in \R$ such that
+	\[ \left| f\big(x_k,y(x_k)\big) - f(x_k,y_k)\right| \leq L \left| y(x_k) - y_k \right|\]
+	Considering this inequality, knowing that $y(x_k) - y_k = \epsilon_k$ and using the triangular inequality we can rewrite equation \ref{eq:ode:temp3} as
+	\begin{equation}
+		|\varepsilon_{k+1}| = |\varepsilon_k| + h L \big|y(x_k)-y_k\big| + \frac{h^2}{2} |y''(\zeta_k)| = A |\varepsilon_k| + B
+	\end{equation}
+	where $A = 1 + hL$ and $B = \frac{h^2}{2} M_2$. In particular $M_2$ is the constant that bounds the second derivative of $y$ in the domain of integration, meaning
+	\[ M_2 = \sup_{x\in[a,b]} \{ y''(x) \} \]
+	Starting with the theoretical assumption that $\varepsilon_0 = 0$ (the initial error is null given the initial condition) and observing that $A\rightarrow 1$ and $B\rightarrow 0$, then we have that $|\varepsilon_1| \leq A 0 + B = B$; the sequent error is so $|\varepsilon_2| \leq A |\varepsilon_1| + B = B(1+A)$. Computing $|\varepsilon_3| \leq B(1+A+A^2)$ it's possible to prove by induction that the error has a formulation
+	\[ |\varepsilon_k| \leq \big(1 + A + A^2 + \dots + A^{k-1}\big) B \]
+	
+	The maximum error $E_h$ of this numerical method is so determined by considering the maximum error respect to all discretization steps:
+	\[ E_h = \max_{k=0,\dots,N} |\varepsilon_k| \leq \max_{k=0,\dots,N} \big(1 + A + A^2 + \dots + A^{k-1}\big) B = \big(1 + A + A^2 + \dots + A^{N-1}\big) B\]
+	Considering the geometrical series determined by $A+ A^2+\dots$ we obtain that such sequence sums to the value $\frac{1-A^N}{1-A}$ and so the error can be considered as
+	\[ E_h \leq \frac{A^N-1}{A-1} B = \frac{A^N - 1}{1+hL - 1} \frac{h^2}{2}M_2 = \frac{A^h - 1}{L} \frac{h}2 M_2 \]
+	All we need now is to quantity the error related to the  term $A^N$; considering that the Taylor series of the exponential sequence $e^x = 1 + x + \frac{x^2}{2!}+\dots$ we have that such quantity is always greater than $1+x$, and so knowing that $A= 1+hL$ we have that $(1+hL)^N \leq \big(e^{hL}\big)^n = e^{LNh}$. Observing that $Nh=b-a$ we can finally state the total error as
+	\begin{equation}
+		E_h\leq \frac{e^{L(b-a)} M_2}{2L} h = Ch
+	\end{equation}
+	where $C\in \R$ is a constant, meaning that for $h\rightarrow 0$ the error presents the expected behaviour of approaching zero. By a computation point of view this method isn't that good, because in order to halve the error we have to halve also the integration step $n$ (doubling the number of intervals $N$). If we would have considered other methods truncated to higher orders of derivation what we would have obtained is an error in the form
+	\[ E_h = C h^p \]
+	hence by dividing by 2 $h$ the error would have been reduces by $2^p$.
+	
+	\paragraph{System of ODEs} Considering the more general case of a system of ordinary differential equation in the standard form using the vectorial notation
+	\[ \begin{cases}
+		\vett y' = \vett f\big(t,\vett y\big) \\ \vett y(a) = \vett y_a
+	\end{cases} \]	
+	the yet described method can be still used by expanding each component of $\vett y$, meaning that the numerical solution can be approximated as
+	\[ \vett y_{k+1} = \vett y_k + h \vett f(x_k, \vett y_k) \]
+	and the error can be regarded as $E_h = \max \|\vett y(x_k) - \vett y_k\| \leq Ch$.
+	
+	\subsection{Implicit methods: back-backward Euler }
+		The numerical method described until now is the \textbf{explicit Euler integration} for determining the solution of ordinary differential equations; the formulation as provided in equation \ref{eq:ode:expliciteuler} (page \pageref{eq:ode:expliciteuler}) is computationally lightweight (because by knowing $x_k,y_k$ at the current stage allows to automatically compute $y_{k+1}$), however is unstable and can quickly diverges from the analytical solution.
+		
+		A way to solve such problematic is by using \textbf{implicit method} that are constructed by performing the Taylor expansion \textit{from the left}. Considering as example the \textbf{Euler back-backward} method, the computed Taylor series is
+		\[ y(x-h) = y(x) - h y'(x) + \frac{h^2}{2} y''(\zeta) = y(x) - h f(x,y) + \frac{h^2}{2} y''(\zeta) \] 
+		This gives origin to the iterative numerical method defined as
+		\[ y_{k-1} = y_k - h f(x_k,y_k)  \]
+		where the solution of the current output $y_k$ is implicitly defined as function of the current \textit{position} $x_k$ and the previous value $y_{k-1}$. This formulation increases the computational complexity (at each iteration a non-linear system has to be solved in order to determine the implicit solution $y_k$) but strongly increases the robustness of the algorithm.
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
