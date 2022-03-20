@@ -98,7 +98,7 @@
 		\[ \rf 1 \rf 2 \neq \rf 2 \rf 1 \]
 		Observe that the product of any 2 (or more) reference frames $\rf i \rf j$ generates a new transformation matrix that allow to relates this new reference frames to the global coordinates.
 		
-		\paragraph{Pure translation} If we consider a reference frame $\rf 2$ defined as pure translation of a frame $\rf 1$ (that's also a pure translation of a world reference frame $\rfw$), as shown in figure \ref{fig:kin:translation}, defined by the transformation matrix 
+		\paragraph{Pure translation} If we consider a reference frame $\rf 2$ defined as pure translation of a frame $\rf 1$ (that's also a pure translation of a world reference frame $\rfw$), as shown in figure \ref{fig:kin:translation}, defined by the transformation matrices 
 		\[ \rf 1 = \transformationmatrix{ &&& x_{01}^w \\ & \I&& y_{01}^w \\ &&& z_{01}^w \\ \hline 0 & 0 & 0 & 1 } \hspace{2cm} \rf 2 = \transformationmatrix{ &&& x_{02}' \\ & \I&& y_{02}' \\ &&& z_{02}' \\ \hline 0 & 0 & 0 & 1 } \]
 		in order to describe the second reference frame into global coordinate system we have to perform the operation $\rf 1 \rf 2$. Performing algebraically the operation we indeed retrieve the intuitive result of a transformation matrix $\rf 2^w$ with no rotation ($\rot = \I$) and center of the base in  $\vett x_1^w + \vett x_2'$, in fact
 		\[ \rf 2^w = \rf 1\rf 2 = \transformationmatrix{ &&& x_{01}^2 + x_{02}' \\ & \I&& y_{01}^2 + y_{02}' \\ &&& z_{01}^2 + z_{02}' \\ \hline 0 & 0 & 0 & 1 } \]
@@ -108,7 +108,7 @@
 			\caption{multiple transformations of pure translation; in this case, for sake of simplicity, the planar case has been considered.} \label{fig:kin:translation}
 		\end{SCfigure}
 	
-		\paragraph{Pure rotation} Considering a reference frame $\rf 2$ that a pure rotation (along the $z$ axis) of an angle $\beta$ respect to a reference frame $\rf 1$ characterized by a pure rotation of angle $\alpha$ respect to the reference frame $\rfw$ (figure \ref{fig:kin:rotational}), their transformation matrix are
+		\paragraph{Pure rotation} Considering a reference frame $\rf 2$ that a pure rotation (along the $z$ axis) of an angle $\beta$ respect to a reference frame $\rf 1$ characterized by a pure rotation of angle $\alpha$ respect to the reference frame $\rfw$ (figure \ref{fig:kin:rotational}), their transformation matrices are
 		\[ \rf 1 = \transformationmatrix{\cos \alpha & -\sin \alpha & 0 & 0 \\ \sin\alpha & \cos \alpha & 0 & 0 \\ 0 & 0 & 1 & 0 \\ \hline 0 & 0 & 0 & 1} \hspace{2cm} \rf 2 = \transformationmatrix{\cos \beta & -\sin \beta & 0 & 0 \\ \sin\beta & \cos \beta & 0 & 0 \\ 0 & 0 & 1 & 0 \\ \hline 0 & 0 & 0 & 1} \]
 		In order to determine the transformation of the second reference frame respect to the ground we so have to compute the product $\rf 1 \rf 2$ between the transformation matrix, hence
 		\[ \rf 2^w = \rf 1 \rf 2 = \transformationmatrix{\cos \alpha \cos \beta -\sin\alpha\sin\beta & -\cos \alpha \sin \beta -\sin\alpha \cos \beta & 0 & 0 \\ \sin\alpha\cos\beta + \cos\alpha\sin\beta & -\sin\alpha\sin\beta + \cos\alpha\cos\beta & 0 & 0 \\ 0 & 0 & 1 & 0 \\ \hline 0 & 0 & 0 & 1} \]
@@ -119,12 +119,11 @@
 			\caption{multiple transformations of pure rotation revolving the $z$ axis.} \label{fig:kin:rotational}
 		\end{SCfigure}
 		
-		\paragraph{Rotation and translation} In the case of pure rotation/translation the reference frame that we have obtained was the same if we would have applied the transformation in reversed order, however this are only particular case. If we consider a translation $\rf 1$ and a rotation $\rf 2$ defined by matrix
+		\paragraph{Rotation and translation} In the case of pure rotation/translation the reference frame that we have obtained was the same if we would have applied the transformation in reversed order, however this are only particular case. If we consider a translation $\rf 1$ and a rotation $\rf 2$ defined by matrices
 		\[  \rf 1 = \transformationmatrix{ &&& x_{01}^w \\ & \I&& y_{01}^w \\ &&& 0 \\ \hline 0 & 0 & 0 & 1 }  \hspace{2cm} \rf 2 = \transformationmatrix{\cos \alpha & -\sin \alpha & 0 & 0 \\ \sin\alpha & \cos \alpha & 0 & 0 \\ 0 & 0 & 1 & 0 \\ \hline 0 & 0 & 0 & 1} \]
-		Intuitively the reference frame obtain by firstly applying the translation ($\rf 1$) is different from the one obtained by rotating first ($\rf 2$), in fact by performing the matrix calculations we obtain
+		Intuitively the reference frame obtain by firstly applying the translation ($\rf 1$) is different from the one obtained by rotating first ($\rf 2$), as also shown in figure \ref{fig:kin:transforder}, in fact by performing the matrix calculations we obtain
 		\[ \rf 1 \rf 2 = \transformationmatrix{ &&& x_{01}^w \\ &\rot_\alpha && y_{01}^w \\ &&& 0 \\ \hline 0&0&0& 1} \hspace{1.5cm} \rf 2 \rf 1  = \transformationmatrix{ &&& x_{01}^w \cos\alpha  - y_{01}^2 \sin\alpha \\ &\rot_\alpha && x_{01}^2 \sin\alpha + y_{01}^w \cos\alpha \\ &&& 0 \\ \hline 0&0&0& 1}  \]
-		
-		
+				
 		\begin{figure}[bht]
 			\centering 
 			\begin{subfigure}{0.48\linewidth}
@@ -136,13 +135,113 @@
 			\caption{reference frame obtained by first translating and than rotating $(a)$ and first rotating and then translating $(b)$.} \label{fig:kin:transforder}
 		\end{figure}
 	
+	\subsection{Primitive rotation matrices}
+		
+		\begin{figure}[bt]
+			\centering \includegraphics[width=10cm]{rotationmatrices}
+			\caption{rotation matrices respect to the $x$ (left), $y$ (middle) and $z$ (right) axis.}
+		\end{figure}
+		
+		We can build any \textbf{rotation matrix} $\rot$ by using \textbf{3 independent sequences of rotation}; they have to be 3 since that's the minimum number of independent coordinates for describing the attitude of a body and they also must be independent since we cannot repeat the rotation around the same axis unless there is an intermediate one.
+		
+		Naming $\rot_x,\rot_y,\rot_z$ the rotation matrix respect to axis $x,y,z$ respectively, examples of independent (hence allowed) rotation transformation are described by the products
+		\[ \rot_x \rot_y \rot_z \hspace{2cm} \rot_y \rot_z \rot_x \hspace{2cm} \rot_x \rot_y \rot_x \]
+		As shown in the last example we can use the same rotation matrix along the same axis if between them a different rotation matrix is used; if we would have considered a rotation $\rot_z \rot_z \rot_x$ we would have had two dependent rotation $\rot_z\rot_z$ around the $z$ axis that provided only one information regarding the attitude of the system (and not 2).
+	 
+	 	\textbf{CHIEDERE EULER AND BRYANT ANGLES}
+	 	
+	 	Usually given a transformation around three consequent axis (as example $(z,x,z)$) with angles $\phi,\theta,\psi$, then other sequences (such $(x,y,z)$) angles can be computed from them, and so choosing different order of rotation axis leads to different rotation angles that can still describe the same attitude (so the same reference frame).
+	 	
+	 	\paragraph{Inverse matrix} Considering a direct sequence that determines the attitude of a body, in order to determine the inverse sequence we can simply reversing the rotation sequence and changing the sign of the angles. An example is determined by
+	 	\[ \textrm{direct seq.: } \rot = \rot_z(\psi) \rot_x(\phi)\rot_y(\theta) \qquad \mapsto \qquad \textrm{inverse seq.: } \rot^{-1} = \rot_y(-\theta) \rot_x(-\phi) \rot_z(-\psi) \]
+		
+		\paragraph{Singular configuration} All sequences of rotation generate a rotation matrix with a \textbf{singular configuration} (also known as \textit{Gimbal lock}) where we cannot distinguish a rotation from another. \\
+		This occurs when the rotational axis of the middle term in the sequence becomes parallel to the rotation axis of the first and third term. The loss of a degree of freedom means that mathematically we cannot invert the transformation, we can only establish a linear relationship between two of the angles; in this case the best we can do is determine the sum of \textit{pitch} and \textit{yaw} angles.
+		
+		Considering as example the sequence of rotation $z,x,y$, we have that the singularity occurs for an angle around $x$ equal to $\pi/2$, in fact it can be shown that
+		\[ \rot_x(\psi) \rot_x(\pi/2) \rot_y(\phi) = \matrix{\cos(\psi+\phi) & 0 & \sin(\psi + \phi) \\ \sin(\psi + \phi) & 0 & -\cos(\psi + \phi) \\ 0 & 1 & 0} \]
+		A singular configuration is obtained for the sequence $z,x,z$ and a null angle considering the transformation $\rot_z(\psi) \rot_x(0) \rot_z(\phi)$.
 	
-	
-	
-	
-	
-	
-	
-	
+	\subsubsection{From rotation matrix to angle}
+		Generally what we have is the \textit{final} rotation matrix $\R$ where the versor of the local base are described in the base of it's reference frame, hence in the form
+		\begin{equation}
+			\rot = \matrix{u_x & v_x & w_x \\ u_y & v_y & w_y \\ u_z & v_z & w_z }
+		\end{equation}
+		This matrix contains 9 parameters and so the problem is determine the values of the angles associated to a set of pure rotation that allow to determine the same attitude in space, such as example $\rot_z(\phi) \rot_x(\theta)\rot_z(\psi)$.
+		
+		\textbf{MAGARI RIVEDERE}
+		
+	\subsection{Rotation matrix properties}
+		A general question that might arise if it exists a vector that's not affected by a rotation $\theta$ around it, meaning that if exists a \de{rotation axis}. Mathematically this is the \textbf{eigenvalue problem} states as
+		\[ \rot \vett v_b = \lambda \vett v_w \] 
+		where the vector $\vett v_b$ in the local frame and $\vett v_w$ in the world reference systems are equals ($\vett v_b = \vett v_w = \vett v$). Reversing this equation we can formulate the eigenvalue problem as
+		\[ \big(\rot - \lambda\I\big) \vett v = \vett 0 \]
+		for which is proven that a solution of the characteristic polynomial is the value $\lambda = 1$, hence we ensure that for any rotation matrix exists an eigenvector with unitary eigenvalue that represents the \textbf{rotation axis}. Defining  $\textrm{tr}\{\rot\}$ the trace of the matrix $\rot$ (the sum of the principle diagonal elements), the other 2 eigenvalues are proven to be complex in the form
+		\[ \lambda_{2,3} = \frac{\textrm{tr}\{\rot\} - 1 }2 \pm j \sqrt{1- \left( \frac{\textrm{tr}\{\rot\} - 1}{2} \right)^2} = \cos\theta \pm j \sin\theta = e^{\pm j\theta} \]
+		and so we can compute the revolution angle around the rotation axis as $\theta = \arccos \left( \frac{\textrm{tr}\{\rot\} - 1}{2} \right)$.
+		
+		Defining with $\rot(\vers n,\theta)$ the rotation about an axis $\vers n$ of an angle $\theta$, we that can observe the following property of the rotation:
+		\begin{align*}
+			i)& \qquad \rot(\vers n,\theta) = \rot (-\vers n,-\theta) \\ 
+			ii) & \qquad \rot(\vers n,\theta + 2\pi k) = \rot(\vers n,\theta) \qquad \forall k \in \mathds Z \\ 
+			iii)& \qquad \textrm{if } \theta= 0 \textrm{ then the rotation is undetermined}
+		\end{align*}
+		The goal now is to define a rotation around a generic axis $\vers n$ of an angle $\theta$ respect to a given reference frame; in order to do so we can firstly apply any transformation that allows to have the third component of the vase $\vers v$ parallel to the chosen direction $\vers n$; we can so proceed applying the rotation along $z$ of the angle $\theta$ and then we have to reverse the initial transformation. An example of rotation around a give axis $\vers n$ is
+		\[ \rot(\vers n,\theta) = \rot_z(\alpha) \rot_y(\beta) \rot_z(\theta) \rot_y(-\beta)\rot_z(-\alpha) = \rot_{\alpha,\beta} \rot_z(\theta) \rot_{\alpha,\beta}^{-1} \]
+		Note that the sequence $\rot_{\alpha,\beta}$ is completely arbitrary and has the pure goal to create a reference frame whose direction $z$ is aligned with $\vers n$ and for that reason 2 independent rotation matrices are required in general.
+		
+		\paragraph{Approach 1} In order to determine the values of the rotation angle $\alpha,\beta$, a solution can be obtained computing the mutually orthogonal versor $\vers i,\vers j$  of the rotated base (functions of the rotation angle $\alpha,\beta$) and impose that their scalar product with the direction $\vers n$ is zero:
+		\[ \begin{cases}
+			\vers n\cdot \vers i_2 = 0 \\ \vers n \cdot \vers j_2 = 0
+		\end{cases} \]
+		We so have a non-linear system of 2 equation in 2 unknowns ($\alpha,\beta$) that has 2 distinct solution depending on the direction (one solution give $\vers n$, the other $-\vers n$).
+		
+		\paragraph{Approach 2} Another approach to determine a rotation matrix given an axis $\vers n$ and the rotation angle $\theta$ is based on the \de{Rodrigues formula}. Given a vector $\vett r_w$ expressed in the world reference frame, it can be regarded as
+		\begin{equation}
+			\vett r_w = \rot(\vers n,\theta) \vett r_b
+		\end{equation}
+		 The vector $\vett r_b$ in the rotated system can be decomposed in a component $\vett r_b^\parallel$ parallel to $\vers n$ and a orthogonal $\vers r_b^\perp$ component that's the lonely affected by the rotation. We can in fact see that $\vett r_b^\parallel = (\vers n\cdot \vett r_b) \vers n = |r_b^\parallel| \vers n$ and so the perpendicular component can be regarded as
+		 \[ \vett r_b^\perp = \vett r_b - \vett r_b^\parallel = \vett r_b - (\vers n \cdot \vett r_b) \vers n \]
+		By applying the transformation on such component, after some calculation we determine the \textbf{Rodrigues formula} as
+		\begin{equation}
+			\vett r_{w,rot} = \cos \theta \vett r_b + (1-\cos\theta)(\vers n \cdot \vett r_b) \vers n + \sin(\vers n \times \vett r_b)
+		\end{equation}
+		\begin{equation}
+		\begin{aligned}
+			\ref{eq:kin:directrototrans} & \mapsto \vector{x_w \\ y_w \\ z_w \\ 1} = \matrix{ \begin{array}{c c c | c}
+					&&& x_0 \\
+					&\rot&& y_0 \\
+					&&& z_0 \\ \hline
+					0&0&0&1
+			\end{array}} \vector{x_b \\ y_b \\ z_b \\ 1} \\
+			\ref{eq:kin:inversrototrans} & \mapsto \vector{x_b \\ y_b \\ z_b \\ 1} = \matrix{ \begin{array}{c c c | c}
+					&&& \\
+					&\rot^{-1}&& -\rot^{-1} \vett O^w \\
+					&&& \\ \hline
+					0&0&0&1
+			\end{array}} \vector{x_w \\ y_w \\ z_w\\ 1}
+		\end{aligned}
+	\end{equation}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	
 	

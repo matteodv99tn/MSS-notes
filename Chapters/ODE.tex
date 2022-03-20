@@ -221,7 +221,8 @@
 	where $\alpha = (\alpha_1,\alpha_2,\dots,\alpha_n)$ is the multi-index vector that consists of non-negative integers; the condition $|\alpha|=k$ based on the norm $|\alpha| = \alpha_1+\alpha_2+\dots + \alpha_n$ choses all combination of $\alpha$ satisfying such relation and the multi-index variable is used for the computation following the expressions
 	\[ \partial_\alpha := \partial_{x_1}^{\alpha_1} \partial_{x_2}^{\alpha_2} \dots \partial_{x_n}^{\alpha_n} f\vett(x) \hspace{2cm} \vett h^\alpha := h_1^{\alpha_1} h_2^{\alpha_2} \dots h_n^{\alpha_n} \]
 	
-\section{Numerical methods based on the Taylor series}
+\section{Numerical methods}
+\subsection{Taylor series based}
 	In practise (systems of) ordinary  differential equations are numerically solved by computes using algorithms some of which are based on the Taylor series expansion. Considering for the simplicity a first order ordinary differential equation in the standard form (equation \ref{eq:ode:temp1})
 	\[ \begin{cases}
 		y' = f(x,y) \\ y(a) = y_a
@@ -272,41 +273,186 @@
 	\[ \vett y_{k+1} = \vett y_k + h \vett f(x_k, \vett y_k) \]
 	and the error can be regarded as $E_h = \max \|\vett y(x_k) - \vett y_k\| \leq Ch$.
 	
-	\subsection{Implicit methods: back-backward Euler }
+	\subsubsection{Implicit method: back-backward Euler }
 		The numerical method described until now is the \textbf{explicit Euler integration} for determining the solution of ordinary differential equations; the formulation as provided in equation \ref{eq:ode:expliciteuler} (page \pageref{eq:ode:expliciteuler}) is computationally lightweight (because by knowing $x_k,y_k$ at the current stage allows to automatically compute $y_{k+1}$), however is unstable and can quickly diverges from the analytical solution.
 		
 		A way to solve such problematic is by using \textbf{implicit method} that are constructed by performing the Taylor expansion \textit{from the left}. Considering as example the \textbf{Euler back-backward} method, the computed Taylor series is
 		\[ y(x-h) = y(x) - h y'(x) + \frac{h^2}{2} y''(\zeta) = y(x) - h f(x,y) + \frac{h^2}{2} y''(\zeta) \] 
 		This gives origin to the iterative numerical method defined as
-		\[ y_{k-1} = y_k - h f(x_k,y_k)  \]
+		\begin{equation} \label{eq:ode:impliciteuler}
+			y_{k-1} = y_k - h f(x_k,y_k)
+		\end{equation} 
 		where the solution of the current output $y_k$ is implicitly defined as function of the current \textit{position} $x_k$ and the previous value $y_{k-1}$. This formulation increases the computational complexity (at each iteration a non-linear system has to be solved in order to determine the implicit solution $y_k$) but strongly increases the robustness of the algorithm.
 	
+	\subsubsection{Other methods based on the Taylor series}
+		In general given the ordinary differential equation
+		\[ \begin{cases}
+			y' = f(x,y) \\ y(a) = y_a
+		\end{cases} \]
+		in order to have a solution we assume that $f$ is continuous and lipschitzian; given $y(x)$ the exact solution of the problem, we can apply the Taylor expansion on such result obtaining
+		\[ y(x+h) = y(x) + h y'(x) + \frac{h^2}{2} y''(x) + \dots + \frac{h^p}{p!} y^{(p)} (x) + \mathcal O(h^{p+1}) \]
+		Knowing that $y(x)$ is the solution of the ODE, then we have that $y'(x) = f\big(x,y(x)\big)$; considering now so it's derivative we have that
+		\begin{align*}
+			y''(x) & = \frac d{dx} y'(x)  = \frac d{dx} f\big(x,y(x)\big) = \pd f x \big(x,y(x)\big) + \pd f y\big(x,y(x)\big) y'(x) \\
+			& = \pd f x \big(x,y(x)\big) + \pd f y\big(x,y(x)\big) f\big(x,y(x)\big)
+		\end{align*}
+		This allows to rewrite the Taylor expansion as
+		\[ y(x+h) = y(x) + h y'(x) + \frac{h^2}{2} \left(\pd f x + \pd f y f \right) + \dots + \frac{h^p}{p!} y^{(p)} (x) + \mathcal O(h^{p+1}) \]
+		The previously described explicit Euler method was determined by neglecting the terms with order higher then $h$, but in this case we have the possibility to express also $y''$ as function of $f$ and $x,y$ increasing hence the numerical accuracy. The numerical method is so
+		\begin{equation} \label{eq:ode:eulersecond}
+			y_{k+1} = y_k + h f(x_k,y_k) + \frac h 2 \left( \pd{f(x_k,y_k)}{x} + \pd{f(x_k,y_k)}{y} f(x_k,y_k) \right)
+		\end{equation}
+		where so in this case we dropped an error in the form $\mathcal O(h^3)$. Increasing the order of the numerical method increases the solution but requires the symbolical computation of the derivatives $\pd f x,\pd f y$; we can carry on the process to explicitly determine all the derivative $y^{(p)}$ (up to a certain order) as function of $x,y$ and partial derivatives of $f$. Considering as example the third derivative of $y$ we see that
+		\begin{align*}
+			y'''(x) & = \frac{d}{dx} y''(x) \\ & 
+			= \pd{^2 f}{x^2} + \pd{^2f}{x\, \partial y} y' + \pd{^2 f}{x\,\partial y} f + \pd{^2f}{y^2} y f + \pd{f}{y} \left( \pd f x + \pd f y y'\right)
+		\end{align*}
+		We can see that numerical method based on the Taylor series are conceptually easy but requires \textit{a lot} of symbolical computation in order to express the derivatives as function of the known variables.
+		\begin{example}{: explicit Euler scheme of the second order}
+			Given the ODE
+			\[ \begin{cases}
+				y' = xy + x \\ y(0) = 1 
+			\end{cases} \]
+			to express the 2$^{nd}$ order Euler scheme we need to compute the partial derivatives
+			\[ \pd f x = y + 1 \hspace{2cm} \pd f y = x \]
+			and hence using equation \ref{eq:ode:eulersecond} we obtain the method
+			\[ y_{k+1} = y_k + h \big(x_k y_k + x_k\big)  +\frac {h^2}2 \Big[ y_k + 1 + x_n \big(x_ny_n + x_n\big) \Big] \]
+			Higher order methods for this problem can be implemented explicitly computing the derivatives
+			\begin{align*}
+				y'(x) & = xy(x) + x  \\
+				y''(x) & = y(x) + x y'(x) + 1 \\
+				y'''(x) & = y'(x) + y'(x) + x y''(x) = 2 y'(x) + x y''(x) \\
+				y^{(4)}(x) & = 2 y''(x) + y''(x) + xy'''(x) = 3 y''(x) + x y'''(x) \\
+				& \hspace{2.2mm}  \vdots
+			\end{align*}
+			The idea is so to determine the numerical method as
+			\[ y_{k+1} = y_k + h y_k' + \frac {h^2}2 y''_k + \frac{h^3}{6} y'''_k + \frac{h^4}{24} y_k^{(4)} + \dots \]
+			where
+			\[ y'_k = x_k y_k + x_k \qquad \rightarrow \quad y''_k = y_k +x_k y'_k +1 \] \[ \rightarrow \quad y'''_k = 2y'_k + x_k y''_k \qquad \rightarrow \quad y^{(4)}_k = 3 y_k'' + x y'''_k \qquad \rightarrow \quad \dots \]
+		\end{example}
+	
+		\paragraph{Economic Taylor scheme} Recalling the higher order method shown in the previous example, a way to simplify the notation on the numerical method based on the Taylor series we consider the scheme
+		\[ y_{k+1} = y_k + h y'_k + \frac{h^2}2 y''_k + \dots + \frac{h^p}{p!} y_k^{(p)} \]
+		where the numerical derivatives are recursively defined considering that $y_k' = f(x_k,y_k)$:
+		\begin{align*}
+			y'_k = D_1\big(x,y(x) \big) & = f(x,y) \\
+			y''_k = D_2\big(x,y(x), y'(x) \big) & = \pd {D_1} x (x,y) + \pd {D_1} y (x,y)\, y'(x,y) \\
+			y'''_k = D_3\big(x,y(x), y'(x),y''(x) \big) & = \pd {D_2} x (x,y) + \pd {D_2} y y' + \pd {D_2}{y'}y''\\
+			& \hspace{2mm} \vdots \\
+			y^{(p)}_k = D_p\big(x,y(x),y'(x),\dots, y^{(p-1)}(x)\big) & = \pd{D_{p-1}}{x} + \pd{D_{p-1}}y + \dots + \pd{D_{p-1}}{y^{(p-2)}} y^{(p-1)}
+		\end{align*}
+			
+	\subsection{Runge-Kutta}
+		Considering the statements seen for numerical methods derived from the Taylor series expansion, we can see that the function $f$ can be expanded by parameters $\alpha,\beta$ as
+		\[ f(x+\alpha, y+\beta) = f(x,y) + \pd f x \alpha + \pd f y \beta + \frac 1 2 \pd{^2f}{x^2}\alpha^2 + \pd{^2f}{x\, \partial y} \alpha \beta + \frac 1 2 \pd{^2f}{y^2} \beta^2 + \mathcal O \Big(\sqrt{\alpha^2+\beta^2}^3 \Big)\]
+		The idea that originates the Runge-Kutta method is so to combine many evaluation of $f(x+\alpha,y+\beta)$ in order to match the results provided by the Taylor series; in general this match determines an error that however should be at maximum comparable to the order $\mathcal O(x^n)$ required. Considering the expansion previously discussed
+		\[ y(x+h) = y(x) + h f\big(x,y(x)\big) + \frac{h^2}{2} \left(\pd f x + \pd f y f \right) + \mathcal O(h^3)  \]
+		we can consider the term
+		\[ (i): \hspace{2cm} h\, f\big(x,y(x)\big) + \frac{h^2} 2 \left( \pd f x + \pd f y f\big(x,y(x)\big) \right) \]
+		and it's Taylor expansion
+		\begin{align*}
+			h\omega f\big(x,y(x)\big) + h\gamma f\big(x+\alpha h, y(x) + \beta h\big) & = h\omega f + h\gamma \left( f + \pd f x \alpha h + \pd f y \beta h + \mathcal O(h^2) \right) \\
+			(ii): \hspace{2cm} & = h\omega f + h\gamma f + h^2 \gamma \alpha \pd f x + h^2 \gamma \beta \pd f y + \mathcal O(h^3)
+		\end{align*}
+		By now subtracting $(ii)$ to $(i)$ we determine
+		\[ h f \big(1-\omega - \gamma \big) + h^2 \pd f x \left( \frac 1 2 - \gamma \alpha \right) + h^2 \pd f y \left( \frac f 2 - \beta \gamma \right) + \mathcal O(h^3) \]
+		In order to reduce the error with a threshold $\mathcal O(h^3)$ we have to set to zero all the multiplicative terms of $f$ (and it's derivatives) determining the following non-linear system:
+		\[ \begin{cases}
+			1 - \omega - \gamma = 0 \\ \frac 1 2 - \gamma \alpha = 0 \\ \frac f 2 - \beta \gamma = 0
+		\end{cases} \]
+		If we determine parameters $\omega,\gamma,\alpha,\beta$ that satisfy such conditions we have that the expansion
+		\[ y(x+h) = y(x) + \omega \, f\big(x,y(x)\big) + \gamma\, f\big(x+ \alpha h, y(x)+ \beta h \big) + \mathcal O(h^3) \]
+		matches the result obtained with Taylor; the system has 3 equation but the unknowns are 4, having so the a parametric solution in the form $\omega = 1-\gamma$, $\alpha = \frac 1 {2\gamma}$ and $\beta = \frac{f}{2\gamma}$ is always satisfied. Substituting this in the original expression we have that all the 2$^{nd}$ order numerical method that do not use \textit{explicitly} the partial derivatives of $f(x,y)$ are
+		\[ y(x+h) = y(x) + h (1-\gamma) f\big(x,y(x)\big) + h \gamma f\left( x + \frac{h}{2\gamma}, y(x) + \frac{h}{2\gamma}f\big(x,y(x)\big) \right) + \mathcal O(h^3) \]
+		determining the numerical method
+		\begin{equation}
+			y_{k+1} = y_k + h (1-\gamma) f\big(x_k,y_k\big) + h \gamma f\left( x_k + \frac{h}{2\gamma}, y_k + \frac{h}{2\gamma}f\big(x_k,y_k\big) \right)
+		\end{equation}
+	
+		\paragraph{Definition} The idea of the \de{Runge-Kutta} method is use a combination of \textit{displacements} in order to match \textit{as much as possible} the Taylor expansion of the exact solution; in particular the numerical steps are written as
+		\begin{equation} \label{eq:ode:rungekutta}
+			\vett y_{k+1} = \vett y_k + \sum_{i=1}^{s} b_j \vett k_j
+		\end{equation}
+		where the $s$ vectors $\vett k_j$ (where $s$ is the order of the Runge-Kutta method) are obtained as
+		\begin{equation}
+		\begin{cases}
+			\vett k_1 = h \, \vett f\left( x_k + c_1 h, y_k + \sum_{j=1}^s A_{1j} \vett k_j \right) \\
+			\vett k_2 = h \, \vett f\left( x_k + c_2 h, y_k + \sum_{j=1}^s A_{2j} \vett k_j \right) \\
+			\hspace{5.7mm} \vdots \\			
+			\vett k_s = h \, \vett f\left( x_k + c_s h, y_k + \sum_{j=1}^s A_{sj} \vett k_j \right) \\
+		\end{cases}
+		\end{equation}
+		where the coefficients $c_j,b_j, A_{ij}$ are computed in such a way that $y_{k+1} - y(x_{k+1}) = \mathcal O(h^p)$ (so the error between the computed value and the theoretical solution) where $p$ is as large as possible. Such values are already tabled in the \de{\textit{Runge-Kutta tableaus}} represented as
+		\begin{equation}
+		\begin{array}{c | c c c}
+			& \\
+			\vett c & & A \\ 
+			& \\ \hline  & & \vett b^t & 
+		\end{array}
+		\end{equation}
+		where $\vett c = (c_1, \dots, c_s)$, $\vett b = (b_1,\dots, b_s)$ (with $\vett c,\vett b \in \R^s$) and $A\in \R^{s\times s}$.
+		
+		\paragraph{Runge-Kutta of order 4} A tableau for the Runge-Kutta method of order 4 is defined as
+		\[ \begin{array}{c | c c c c}
+			0 &  \\
+			\frac 1 3 & \frac 1 3 & \\
+			\frac 2 3 & - \frac 1 3 & - 1 \\
+			1 & 1 & -1  & 1 \\ \hline
+			& \frac 1 8 &  \frac 3 8 & \frac 3 8 & \frac 1 8
+		\end{array} \]
+		where the non-represented terms are zeros. Recalling equation \ref{eq:ode:rungekutta} as the definition of the Runge-Kutta, we have that the numerical method derived from that is
+		\[ y_{k+1} = y_j + \frac 1 8 k_1 + \frac 3 8 k_2 + \frac 3 8 k_3 + \frac 1 8 k_4 \]
+		where
+		\[ \begin{cases}
+			k_1 & = h\, f(x_k,y_k) \\
+			k_2 & = h\, f\left( x_k + \frac 1 3 h, y_k + \frac 1 3 k_1 \right) \\
+			k_3 & = h\, f\left( x_k + \frac 2 3 h, y_k - \frac 1 3 k_1 - k_2\right) \\
+			k_4 & = h\, f\left( x_k + h, y_k + k_1 - k_2 + k_3 \right) \\
+		\end{cases}\]
+		In this case the method is \textbf{explicit}: in fact we can sequentially compute $k_1$ (that depends on the knowns $h,x_k,y_k$) and sequentially $k_2$, then $k_3$ and lastly $k_4$.	
+	
+		\paragraph{Euler methods} If we consider the \textit{strange} tableau 
+		\[ \begin{array} {c |c}
+			0 & 0 \\ \hline & 1
+		\end{array} \]
+		what we obtain is the explicit Euler method, in fact having $k_1 = h\, f(x_k,y_k)$ determines the method
+		\[ y_{k+1} = y_k + 1 k_1 = y_k + h f(x_k,y_k) \]
+		and perfectly matches the definition provided in equation \ref{eq:ode:expliciteuler} at page \pageref{eq:ode:expliciteuler}. Considering now instead the tableau
+		\[ \begin{array} {c |c}
+			1 & 1 \\ \hline & 1
+		\end{array} \]
+		it determines an \textbf{implicit} method: we in fact have that $k_1 = h\, f(x_k + h, y_k + k_1)$ where the solution is implicit in $k_1$; considering that such relation can be regarded as $k_1 = h f(x_{k+1}, y_{k+1})$ what we determine is the implicit Euler method (equation \ref{eq:ode:impliciteuler}, page \pageref{eq:ode:impliciteuler})
+		\[ y_{k+1} = y_k + h \, f\big(x_{k+1}, y_{k+1}\big) \]
+		
+		If we in general have that all the elements $A_{ij}$ with $j\geq j$ are all zeros, then the Runge-Kutta scheme is explicit meaning that all the coefficients $\vett k_1,\vett k_2,\dots, \vett k_s$ can be computed consecutively. \textit{Graphically} this means that the matrix $A$ must have non-zero terms only below its principal matrix not included (it means that $A_{ii}$ must always be zero).
+		
+		\subsubsection{One step methods}
+		Usually we refer to \textbf{\textit{one step methods}} the ones that allow to explicitly compute the next step as function of the current step in the form
+		\[ y_{k+1} = \phi(x_k,y_h,h) \]		
+		An example is the explicit Euler method (equation \ref{eq:ode:expliciteuler}, page \pageref{eq:ode:expliciteuler}) that's characterized by the function $\phi(x_k,y_k,h) = y + h f(x_k,y_k)$. Also implicit methods can be one step; considering the implicit Euler (equation \ref{eq:ode:impliciteuler}, page \pageref{eq:ode:impliciteuler}) it can be considered as 
+		\[ y_{k+1} = y_k + K_1 \hspace{2cm} \textrm{with } K_1 = h\, f\big(x_{k+1}, y_k + K_1\big) \]
+		the value $K_1$ is formally a function of the parameters $x_k,y_k,h$, hence
+		\[ G\big(K_1, x_k,y_k,h\big) = K - h\, f\big(x_k + h y_k + K\big) \hspace{2cm} \Rightarrow \qquad \phi(x,y,h) = y + K(x,y,h) \]
+		
+		In general all Runge-Kutta methods (both explicit and implicit) can be formally written in the form $y_{k+1} = \phi(x_k,y_k,h)$ and so are one step methods.
+		
+		\subsubsection{Error propagation}
+		Known that each Runge-Kutta is a one-step method, then we can express the \textbf{local truncation error} $\tau_k(h)$ as the difference between the theoretical computed value and the numerical result obtained:
+		\[ y\big(x_{k+1}\big) = \phi\big(x_k, y(x_k),h\big) + \tau_k(h) \hspace{1.4cm} \Rightarrow \hspace{1.4cm} \tau(h) = y(x+h) -\phi\big(x,y(x),h\big) \]
+		Considering the \textbf{error} $\varepsilon_k = y\big(x_k\big) - y_k$ as the difference between the analytical solution and the numerical approximated one, we can regard the two cases as
+		\begin{align*}
+			(i): && \qquad y_{k+1} & = \phi(x_k,y_k,h) \\ 
+			(ii): && \qquad y\big(x_{k+1}\big) & = \phi\big(x_k,y(x_k),h\big) + \tau_k(h)
+		\end{align*}
+		performing the difference $(i)-(ii)$ what we obtain is
+		\[ \varepsilon_{k+1} = \Big( \phi\big(x_k,y(x_k),h\big) - \phi(x_k,y_k,h) \Big) + \tau_k(h)\]
+		Considering the simple case of the explicit Euler method characterized by a function $\phi(x,y,h) = y + h\, f(x,y)$, the difference in the parenthesis is in the form $\phi(x,z,h) - \phi(x,y,h) = z - y + h\big(f(x,z) - f(x,y)\big)$; computing it's absolute value we have and considering that $f$ is lipschitzian we have
+		\[\big|\phi(x,z,h)-\phi(x,y,h) \big|  \leq |z-y| + h \big| f(x,z)- f(x,y) \big| \leq (1+hL) |z-y|\]
+		We can so rewrite the magnitude of the error as
+		\[ |\varepsilon_{k+1}| \leq (1+hL) \big| y(x_k) - y_k \big| + |\tau_k(h)| \leq (1+hL) |\varepsilon_k| + |\tau_k(h)| \]
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		\textbf{MIN 7.08}
 	
 	
 	
