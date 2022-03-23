@@ -301,13 +301,24 @@
 		The problem of this formulation is that it isn't intuitive the rotation $\alpha$ of the reference frame respect to the global direction $\vers i_0$, however this can be achieved equating $\R$ with the rotation matrix function of $\alpha$:
 		\[ \matrix { \frac{x_2 - x_1}{L} & -\frac{y_2 - y_1}{L} & 0 \\ \frac{y_2 - y_1}{L} & \frac{x_2 - x_1}{L} & 0 \\ 0 & 0 & 1 } = \matrix { \cos\alpha & - \sin \alpha & 0 \\ \sin\alpha & \cos \alpha & 0 \\ 0 & 0 & 1} \quad \Rightarrow \quad \sin\alpha = \frac{y_2 - y_1}{2} \quad \Rightarrow \quad \alpha = \arcsin \left( \frac{y_2 - y_1}{2} \right)  \]
 		
+\section{Multi-body approach}
+	A system characterized by $n_b$ free bodies (in the sense that they are not constrained together) results in a 
+	\[ 6 n_b \textrm{ degrees of freedom} \]
+	for the system; such value indeed represents also the minimum number of components for the \de{generalized coordinates} $\vett q \in \mathds R^n$ of the system itself. Note that this is the minimum value, because if we use quaternion representation for representing the transformation matrices associated to bodies, each of them has 7 different parameters (not 6, but it also introduced the associated constraint equation).
+	
+	Each added mechanical joint results in a mathematical constraint that reduces the degree of freedom of the system; such joints are described by the vectorial map $\vett \Phi(\vett q) = \vett 0 \in \mathds R^m$ that models $m$ constraint equations. This reduces the number $n_i$ of independent generalized coordinates:
+	\[ \vett q = (\vett q_i, \vett q_d) \]
+	where $\vett q \in \mathds R^n$ are the \textit{original} generalized coordinates, $\vett q_i \in \mathds R^{n_i}$ are the independent and $\vett q_d\in \mathds R^{n_d}$ are the dependent coordinates (of course it must hold $n_i + n_d = n$). The total number of \textbf{degrees of freedom} of the system can so be computed as
+	\[ DOF = n - m \]
+	In general the constrained degrees of freedom strictly depends on the actual position and geometry of the system that's strictly related to time, and so given the constraint map $\vett \Phi(\vett q) : \mathds R^n \mapsto \mathds R^m$ (where $n>m$) the actual number of constrained degrees of freedom is
+	\begin{equation}
+		m = \rank{\pd {\vett \Phi(\vett q)}{\vett  q} }
+	\end{equation}
+	where $\partial \vett \Phi / \partial \vett q \in \mathds R^{m\times n}$ is the Jacobian of the map $\vett \Phi$.
 		
-		
-		
-		
-		
-		
-		
+	\textbf{DA RIVEDERE QUESTA PARTE}
+	
+	
 		
 		
 		
