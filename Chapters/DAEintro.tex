@@ -1,0 +1,195 @@
+\chapter{Introduction to Algebraic Differential Equations}
+	
+	The \de{algebraic differential equations} \textbf{DAEs} can be regarded as a system of ordinary differential equations combined with \textit{general} algebraic equations; as example a DAE system is
+	\[ \begin{cases}
+		y' = f(x,y) \\
+		y(a) = y_a \\
+		f(x,y) = 0 \\
+		x^2-y = 3
+	\end{cases} \] 
+	In general for ODEs and algebraic equations a lot of numerical methods have been implemented with consolidated theory regarding existence, stability... The problem is that when combining such theories in the algebraic differential equations, the numerical results that we might wanna retrieve are a \textit{nightmare} to compute.
+	
+	\paragraph{DAE with an example: simple pendulum} Considering the simple pendulum of a mass $m$ fixed by a bar of length $l$ to a pivot point; considering such center as the origin of a reference frame, the coordinates of the mass can be described as function of using the minimal number of coordinates (associated in this case to lagrangian coordinate $\theta$ as the angle between the bar and the vertical line) as
+	\[ x= l\sin\theta \hspace{2cm} y = -l\cos\theta \]
+	The idea is that this coordinates satisfy the constraint $x^2 + y^2 = l^2$, meaning that the mass $m$ can move only on the circle of radius $l$. Taking the velocities
+	\[ \dot x = \frac {dx}{dt} = l\cos\theta \, \dot\theta \hspace{2cm} \dot y = \frac{dy}{dt} = l\sin\theta \,\dot\theta \]
+	Computing the kinematic and potentials energy as
+	\[ T = \frac m 2 \big(\dot x^2 + \dot y^2\big) = \frac m2 l^2 \dot \theta^2 \hspace{2cm} V = mgy = -mgl\cos\theta  \]
+	With this we can build the lagrangian $\lag = T - V = \frac m 2 l^2 \dot \theta^2 + mg l\cos\theta$ and using the Euler-Lagrange equation (following the minimal action principle) the differential equation describing the motion is
+	\[ \frac d{dt} \pd \lag {\dot\theta} - \pd \lag \theta = ml^2\ddot \theta + mgl\sin\theta = l\ddot \theta + g\sin\theta = 0 \]
+	where the ordinary differential equation, in order to be solved/integrated, requires the initial conditions $\theta(0) = \theta_0$ and $\dot \theta(0) =\dot \theta_0$. Introducing $\omega = \dot \theta$ we can reduce the system of ODEs to the first order that can be numerically solved:
+	\[ \begin{cases}
+		\dot \theta = \omega \\
+		l\dot \omega + g\sin\theta = 0 \\
+		\theta(0)  = \theta_0 ,\quad \omega(0) = \omega_0 = \dot\theta_0
+	\end{cases} \]
+	Observe that we obtained the solution as an ordinary differential equation because we found the \textit{minimal} set of coordinates which describes the system.
+	
+	As alternative approach we could have used simpler independent ordinary differential equations and add some constraints; considering the independent mass $m$  described by the point $(x,y)$ in the plane and constrained to move on a circle of radius $l$, it's kinetic and potential energies are still $T = \frac m2 \big(\dot x^2 + \dot y^2\big)$ and $V = mgy$ (note that no transformation in terms of $\theta$ has been applied), then the lagrangian is
+	\[ \lag = T-V = \frac m 2 \big(\dot x^2 + \dot y^2\big) - mgy \]
+	The constraint is described by the equation $\phi(x,y) = x^2 + y^2 - l^2 = 0$. Adding to the constraint the least action principle stating that the functional $\mathcal A = \int_{t_0}^{t_1} \lag (x,y,\dot x,\dot y,t)\, dt$ we can find the \textit{stationary point} of the action $\mathcal A$ that's subject to $\phi(x,y) = 0$. Expanding the definition
+	\[ \int_{t_0}^{t_1} \lag (x,y,\dot x,\dot y,t) - \lambda \phi(x,y)\, dt  \]
+	we can build the hamiltonian $\H = \lag - \lambda \phi$ that, after the first variation, determines the system
+	\[ \begin{cases}
+		\frac d{dt} \pd \H{\dot x} - \pd \H x & = m\ddot x + \lambda x = 0 \\
+		\frac d{dt} \pd \H{\dot y} - \pd \H y & = m\ddot y + \lambda y = -mg \\
+		\phi(x,y) & = x^2 + y^2 - l^2= 0
+	\end{cases} \]
+	that is a \textbf{differential algebraic equation}; introducing $\dot x = u$ and $\dot y = v$ we can simplify to a differential algebraic equation
+	\begin{equation} \label{eq:dae:daesys}
+		\begin{cases}
+			m \dot u + \lambda x = 0 \\
+			m \dot v + \lambda y = -mg \\
+			\dot x= u, \qquad \dot y = v\\
+			x^2 + y^2 - l^2= 0
+		\end{cases} 
+	\end{equation}
+	
+	\paragraph{Introduction to numerical methods for DAEs} Considering the example of the pendulum, we can rewrite the differential equations as
+	\[ \vector{\dot x \\ \dot y \\ \dot u \\ \dot v \\ 0 } = \vector{u \\ v \\ -\lambda x/m \\ -\lambda y / m - g \\x^2+y^2-l^2} \]
+	Defining $\vett z = (x,y,u,b,\lambda)$, such relation is similar to the form $\dvett z = \vett F(t,\vett z)$. The main idea is in fact to \textbf{transform DAEs to ODEs}; note in fact that the last equation is the lonely one that's not already a ordinary differential equation: deriving it in time determines
+	\[ \frac d{dt}\big(x^2 + y^2 - l^2\big) = 2 x\dot x + 2 y\dot y = 2x u + 2 yv  \]
+	but stull we observe that the variable $\lambda$ is missing in the equation. Deriving one more time respect to $t$ we obtain
+	\begin{equation} \label{eq:dae:secder} \begin{aligned}
+		\frac{d}{dt}\big( 2x u + 2 yv \big) & = 2\dot x u + 2 x\dot u + 2\dot y v + 2 y \dot v = 2 u^2 + 2 v^2 - 2 x \frac{\lambda x}{m} - 2 y \left( \frac{\lambda y}m + g \right) \\
+		& = 2\big( u^2 + v^2\big) - \frac{2\lambda}{m} \big(x^2 + y^2\big) - 2 y g
+	\end{aligned} \end{equation}
+	By substituting the different known relations for $\dot x,\dot y, \dot u, \dot v$ we so obtain a derivative that's function of $\lambda$, but not of $\dot \lambda$. Deriving one more time respect to the variable $t$
+	\begin{align*}
+		\frac{d}{dt}(\ref{eq:dae:secder}) & = 4\big(u\dot u + v\dot v\big) - \frac{4\lambda}{m} \big(x\dot x + y\dot y\big) - 2 \dot y g - \frac 2 m \dot \lambda \big(x^2 + y^2\big) \\
+		& = 4 \left( - u \frac{\lambda  x}{m} - v \frac{\lambda y}{m} - vg \right) - \frac{4\lambda}{m} \big(xu + yv\big) - 2 vg - \frac 2 m \dot \lambda\big(x^2+y^2\big) = 0
+	\end{align*}
+	Solving for $\dot \lambda$ so gives
+	\[ \dot \lambda = \frac{-4\lambda\big(xy+yv\big) -3 vmg }{x^2+y^2} \]
+	We can so rewrite the differentia algebraic system in equation \ref{eq:dae:daesys} as a system of ODE only as
+	\[ \begin{cases}
+		\dot x = u \\ \dot y = v \\ \dot u = - \frac l m x \\ \dot v = - \frac \lambda m y - g \\ \dot \lambda = \frac{-4\lambda\big(xy+yv\big) -3 vmg }{x^2+y^2} 
+	\end{cases} \]
+	With such definition we can use numerical methods to solve the form $\dvett z = \vett F(t,\vett z)$. This formulations however introduces some problems:
+	\begin{itemize}
+		\item the initial condition on $\lambda$ is not set. This problem can be overcome considering that given $x$, the coordinate $y$ is constrained by $x^2 + y ^2 = l^2$. If we moreover know $\dot x = u$ then using the derivative of the constraint $2xy + 2yv = 0$, then also $v = \dot y$ is constrained. Using the second derivative of the constraint (equation \ref{eq:dae:secder}) we can finally solve for $\lambda_0$. We see that the initial conditions must satisfy the \textit{original} constraints and the \textit{hidden ones} determined by the derivatives of the algebraic equations. 
+		
+		\item another problem is that if we considered a constraint in the form
+		\[ \phi(x,y) = x^2 + y^2 - l^2 +a + bt + ct^2 = 0 \]
+		in order to obtain the ODE equivalent system we have to derive $\phi$ three times over time resulting in the cancellations of the polynomial  terms $a + bt+ ct^2$ (we in fact would have obtained the same ODE system).
+
+	\end{itemize}
+
+\section{Linear differential algebraic equations}
+	Starting from the simplest cases of study, a generic differential algebraic equation can be written as
+	\[ \begin{cases}
+		\vett F(t,\vett y, \vett y') = 0 \\ \vett y(a) = \vett y_a
+	\end{cases} \]
+	with $\vett y(t) \in \mathds R^n$. We can say that the map $\vett F$ is \de{linear} in $y$ if it can be expressed as linear combination of $\vett y'$ in the form
+	\begin{equation} \label{eq:dae:linear}
+		\vett F(t,\vett y, \vett y') = \mat E(t,\vett y) \vett y' + \vett G(t,\vett y)
+	\end{equation}
+	Moreover the map $\vett F$ is linear in both $\vett y$ and $\vett y'$ if it can be regarded as
+	\begin{equation} \label{eq:dae:linear2}
+		\vett F(t,\vett y, \vett y') = \mat E(t) \vett y' + \mat A(t) y  - \vett C(t)
+	\end{equation}
+	where in general $\mat E,\mat A$ are matrices that can sometimes be singular. The map $\vett F$ is said \de{linear with constant coefficients} if it happens that the matrices $\mat E,\mat A$ are time independent.
+	
+	\begin{example}{: linear DAEs}
+		An example of linear differential algebraic equation is the one that can be described as
+		\[ \matrix{1 & t \\ t^2 & 2} \vector{ y_1' \\ y_2'} + \matrix{\sin t & \cos t \\ t^2 & 1} \vector{y_1 \\ y_2} - \vector{e^t \\ 1+t} \]
+	\end{example}
+	
+	Observe that if the matrix $\vett E$ in non singular, expression \ref{eq:dae:linear} corresponds to a \textit{simple} ordinary differential equation: it can be in fact rewritten as
+	\begin{equation}
+		\vett y' = - \mat E^{-1}(t,\vett y) \vett G(t,\vett y) = \vett f(t,\vett y)
+	\end{equation}
+	For the moment we can assume that if $\mat E$ is singular the system is not an ODE. In this first part we will focus on linear differential algebraic equations in order to exploit linear algebra tools to ease the calculations.
+	
+	\paragraph{Jordan normal form} As a recall from the linear algebra, given a matrix $\mat B \in \mathds R^{n\times n}$ there exists always a non-singular matrix $\mat T \in \mathds R^{n\times n}$ such that 
+	\[ \mat T^{-1} \mat B \mat T= \mat J\]
+	where $\mat J$ is the \de{Jordan matrix form} defined as 
+	\begin{equation}
+		\mat J = \matrix{J_1 &&& 0 \\ & J_2 \\ && \ddots \\ 0 &&& J_m} \qquad \textrm{where } J_k = \matrix{ \lambda_k & 1 & & 0 \\ & \ddots & \ddots \\
+		&& \ddots & 1 \\ 0 &&& \lambda_k }
+	\end{equation}
+
+	\paragraph{Regular pencil} Given the matrices $\mat B, \mat C \in \mathds R^{n\times n} $, the couple  $(\mat B,\mat C)$ is a \de{regular pencil} if 
+	\[ f(\lambda) = \det\big( \mat B - \lambda \mat C \big) \neq 0 \]
+	is not identically null, or equivalently if there exists a $\lambda$ such that $f(\lambda) \neq 0$. Considering as example the matrices 
+	\[ \mat B = \matrix{1 & 1 \\ 0 & 0} \hspace{2cm} \mat C = \matrix{1 & 0 \\ 0 & 0 } \]
+	is not a regular pencil, in fact the polynomial $f(\lambda) = \det(\mat B - \lambda \mat C) = \det \matrix{1-\lambda & 1 \\  0 & 0 } = 0$ always evaluates to zero. 
+	
+	\paragraph{Nilpotent matrix} A matrix $\mat B \in \mathds R^{n\times n}$ is \de{nilpotent} of order $p$ if
+	\begin{equation}
+		\mat B^p = 0 \quad\textrm{and} \quad \mat B^j \neq 0 \ \forall j < p 	
+	\end{equation}
+	where $\mat B^p$ is the product $\mat B \mat B\dots \mat B$ $p$ times. Considering as example
+	\[ \mat B = \matrix{0 & 1 & 2 \\ 0 & 0 & 3 \\ 0 & 0 & 0} \qquad \mat B^2 = \matrix{ 0 & 0 & 3 \\ 0 & 0 & 0 \\ 0 & 0 & 0 } \qquad \mat B^3 = \matrix{ 0 & 0 & 0 \\ 0 & 0 & 0 \\ 0 & 0 & 0 } \]
+	we have that such matrix $\mat B$ is nilpotent of order 3. Observe that if the matrix $\mat B$ is non-singular, than it can't be nilpotent.
+	
+	\paragraph{Kronecker normal form} If we consider two regular pencil matrices $(\mat B,\mat C) \in \mathds R^{n\times n}$, then there exists two non-singular matrices $\mat P, \mat Q \in \mathds R^{n\times n}$ such that 
+	\begin{equation}
+		\mat P \mat B \mat Q = \matrix{\mat N & 0 \\ 0 & \mat I} \qquad \textrm{and} \qquad \mat P \mat C \mat Q = \matrix{\mat I & 0 \\ 0 & \mat J}
+	\end{equation}
+	where $\mat N$ is a nilpotent matrix, $\mat I$ is the identity matrix and $\mat J$ is a Jordan normal form matrix. Considering that the \textit{blocks} $\mat N,\mat J$ can be empty, as extreme cases we have $\mat{PBQ} = \mat I$, $\mat{PCQ} = \mat J$, $\mat{PBQ} = \mat N$ and $\mat{PCQ} = \mat I$.
+	
+	\subsection{Usage of the Kronecker normal form}
+		To ease the computation of linear differential algebraic equation, we can use the Kronecker normal form assuming that the couple of matrices  $(\mat E,\mat A)$ (equation \ref{eq:dae:linear2}) are a regular pencil (in order not to have an \textit{inconsistent} DAE).
+		
+		\begin{example}{: inconsistent DAE}
+			Using the matrices defined used in the theory of regular pencil, we can build a DAE system of the form
+			\[ \matrix{1 & 1 \\ 0 & 0} \vector{y_1' \\ y_2'} + \matrix{0 & 1 \\ 0 & 0 } \vector{y_1 \\ y_2} = \vector{t \\ 1} \]
+			the associated system is
+			\[ \begin{cases}
+				y_1' + y_2' + y_2 = t \\ 0 = 1
+			\end{cases} \]
+			that's inconsistent.
+		\end{example}
+		 With such assumption we can compute the Kronecker normal form $\mat{PEQ} = \matrix{\mat N \\ & \mat I}$ and $\mat{PAQ} = \matrix{\mat I \\ & \mat J}$; premultiplying so equation \ref{eq:dae:linear2} by $\mat P$ results in $\mat{PE}\vett y' + \mat{PA}\vett y = \mat P \vett C$.
+	\newcommand{\y}{\vett y} \newcommand{\z}{\vett z} \newcommand{\inv}{^{-1}}
+		Performing the change of variable $\mat Q \z = \y$ (hence $\z = \mat Q\inv$) and observing that $\mat Q \z' = \y'$ we obtain the expression $\mat{PEQ} \z' + \mat{PAQ}\z = \mat P\vett C$ on top of which we can apply the Kronecker normal form:
+		\[ \matrix{\mat N \\ & \mat I} \z' + \matrix{\mat I \\ & \mat J} \z = \mat P \vett C  \]
+		Splitting both vectors $\vett z = (\vett \alpha,\vett \beta)$ and $\mat P\vett C = (\vett d,\vett e)$ we can rewrite this expression as
+		\[ \matrix{\mat N \\ & \mat I} \vector{\vett \alpha' \\ \vett \beta'} + \matrix{\mat I \\ & \mat J} \vector{\vett \alpha \\ \vett \beta} =\vector{\vett d \\ \vett e}  \]
+		The associated linear system representation is
+		\[ \begin{cases}
+			i)&\mat N \vett \alpha ' + \vett \alpha = \vett d(t) \\
+			ii)& \vett \beta' + \mat J \vett \beta = \vett e
+		\end{cases} \]
+		$ii)$ represent a \textit{standard} system of ordinary differential equations; the term $i)$ is instead more complex but we can invert the relation to obtain $\vett \alpha = \vett d - \mat N \vett \alpha'$. Observing that the $k$-th derivative in time of this expression evaluates to $\vett \alpha^{(k)} = \vett d^{(k)} - \mat N \vett \alpha^{k+1}$, we can substitute the derivatives $\vett \alpha^{(k)}$ determining
+		\begin{align*}
+			\vett \alpha & = \vett d - \mat N \vett \alpha' = \vett d - \mat N(\vett d' - \mat N \alpha'') = \vett d - \mat N \vett d' + \mat N^2 \vett \alpha'' = \vett d - \mat N \vett d' + \mat N^2 (\dots) = \dots \\
+			& = \vett d - \mat N \vett d' + \mat N^2 \vett d'' - \mat N^3 \vett d''' + \mat N^4 \vett d^{(4)} - \mat N^5 \vett d^{(5)} + \dots
+		\end{align*}
+		This series is infinite, however being $\mat N$ a nilpotent matrix of order $p$ we have only that the first $p$ terms remains and so
+		\begin{equation}
+			\vett \alpha = \vett d - \mat N \vett d' + \mat N^2 \vett d'' +\dots  + (-1)^{p-1} \mat N^{p-1}\vett d^{(p-1)} + \cancel{(-1)^p \mat N^p \vett d^{(p)}} = \sum_{j=0}^{p-1} (-1)^j \mat N^j \vett d^{(j)}
+		\end{equation}
+		With this relation we determined $\vett \alpha$ without using the initial conditions (as was required for the DEA solution using the conversion to ODE), depends only on $\vett d$ (and it's derivatives up to the $p-1$ order). Also observe that $ii)$ is a \textit{regular} ODE, hence the initial values $\vett \beta(0)$ must be specified.
+		
+		The order of the nilpotency of the matrix $\mat N$ is the so called \de{index} of the differential algebraic equation (for the linear ones) and is a sort of \textit{measure} of the \textit{difficulty} of solving numerically the DAE. In particular if $p=0$ then what we have is a system of ordinary differential equation while if $p=n$ we have a set of only algebraic equations.
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

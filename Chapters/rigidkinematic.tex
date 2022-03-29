@@ -306,19 +306,88 @@
 	\[ 6 n_b \textrm{ degrees of freedom} \]
 	for the system; such value indeed represents also the minimum number of components for the \de{generalized coordinates} $\vett q \in \mathds R^n$ of the system itself. Note that this is the minimum value, because if we use quaternion representation for representing the transformation matrices associated to bodies, each of them has 7 different parameters (not 6, but it also introduced the associated constraint equation).
 	
-	Each added mechanical joint results in a mathematical constraint that reduces the degree of freedom of the system; such joints are described by the vectorial map $\vett \Phi(\vett q) = \vett 0 \in \mathds R^m$ that models $m$ constraint equations. This reduces the number $n_i$ of independent generalized coordinates:
+	\paragraph{Path and trajectory} It is important to distinct the \textbf{path} as a sequence of configurations (that are independent from the concept of time) and the \textbf{trajectory} as the sequence of configurations that are changing with time. In this sense a trajectory can be regarded as a parametrization in time of a path.
+	
+	\paragraph{Independent motions} Each added mechanical joint results in a mathematical constraint that reduces the degree of freedom of the system; such joints are described by the vectorial map $\vett \Phi(\vett q) = \vett 0 \in \mathds R^m$ that models $m$ constraint equations. This reduces the number $n_i$ of independent generalized coordinates:
 	\[ \vett q = (\vett q_i, \vett q_d) \]
-	where $\vett q \in \mathds R^n$ are the \textit{original} generalized coordinates, $\vett q_i \in \mathds R^{n_i}$ are the independent and $\vett q_d\in \mathds R^{n_d}$ are the dependent coordinates (of course it must hold $n_i + n_d = n$). The total number of \textbf{degrees of freedom} of the system can so be computed as
+	where $\vett q \in \mathds R^n$ are the \textit{original} generalized coordinates, $\vett q_i \in \mathds R^{n_i}$ are the independent and $\vett q_d\in \mathds R^{n_d}$ are the dependent coordinates (of course it must hold $n_i + n_d = n$). The total number of \de{degrees of freedom} (representing the minimum number of independent motion to the describe the configuration of the multi-body system) of the system can so be computed as
 	\[ DOF = n - m \]
 	In general the constrained degrees of freedom strictly depends on the actual position and geometry of the system that's strictly related to time, and so given the constraint map $\vett \Phi(\vett q) : \mathds R^n \mapsto \mathds R^m$ (where $n>m$) the actual number of constrained degrees of freedom is
 	\begin{equation}
 		m = \rank{\pd {\vett \Phi(\vett q)}{\vett  q} }
 	\end{equation}
-	where $\partial \vett \Phi / \partial \vett q \in \mathds R^{m\times n}$ is the Jacobian of the map $\vett \Phi$.
+	where $\partial \vett \Phi / \partial \vett q \in \mathds R^{m\times n}$ is the Jacobian of the map $\vett \Phi$. If the Jacobian has so it's maximum rank it also means that $\det \pd{\vett \Phi}{\vett q} \neq 0$; every time such determinant is null we are in a situation where 1 or more joints are redundant: such condition might happen locally, but if it happens permanently it is necessary to eliminate the redundant equation in order to make the solver solve the problem.
+	
+	\paragraph{Velocity constraints} If we have  that the constraint map $\vett \Phi$ set a conditions on the generalized coordinates $\vett q$ to be $\vett \Phi(\vett q) = \vett 0$, then it means that also the velocities $\dvett q$ are constrained: deriving in time $\vett \Phi( \vett q ) = \vett 0$ results in fact
+	\begin{equation}
+		\pd{\vett \Phi (\vett q)}{\vett q} \dvett q + \pd{ \vett \Phi(\vett q)}{t} = \vett 0
+	\end{equation}
+
+	\paragraph{Constraint classification} The constraint map $\vett \Phi$ can be classified respect to different aspects; if the constraint explicitly depends on time $\vett \Phi$ is said \textbf{rehonomous} while in the other case is said \textbf{scleronomous}, mathematically
+	\[ \vett \Phi\big(\vett q(t), t\big) = 0 \textrm{: rehonomous} \hspace{2cm} \vett \Phi\big(\vett q(t)\big) = 0 \textrm{: scleronomous} \]
+	Constraint are said \textbf{holonomic} if it involves only the actual configuration of the system, while is \textbf{non-holonomic} if it requires also velocities or higher order derivative of $\vett q$:
+	\[ \vett \Phi\big(\vett q(t)\big) = 0 \textrm{: holonomic} \hspace{2cm} \vett \Phi\big(\vett q(t), \dvett q(t),\dots\big) = 0 \textrm{: non-holonomic} \]
+	
+\subsection{Topology}
+	A \textbf{multi-body} system is a collection of (multiple) bodies, joints, forces and torques; the \de{topology} studies in particular how such elements are connected specially involving the use od \textbf{linear graphs}.
+	
+	In order to construct such graphs (as exemplified in figure \ref{fig:mb:lineargraph}) we can follow this procedure:
+	\begin{enumerate}
+		\item define a reference frame for each body and assign them a node (in the next figure green);
+		\item define auxiliary reference frames that will be used to define constraints; such elements are still nodes in the linear graph but doesn't introduce any additional coordinate because they are fixedly dependent on the relative body frame;
+		\item connect all the nodes with \textit{arrow} (formally edges) representing the constraints between nodes (reference frames). 
+	\end{enumerate}		
+
+	\begin{figure}[bht]
+		\centering \includegraphics[width=8cm]{lineargraph}
+		\caption{example of linear graph generation of a slider-crank mechanism where each body is characterized by a reference frame in ground coordinates (green nodes) and dashed-red lines are describing the mechanical joints.}
+		\label{fig:mb:lineargraph}
+	\end{figure}
+	
+	Defining the \textbf{path} as a (finite/infinite) sequence of edges which joins a set of distinct nodes, we then have a \de{circuit loop} when the path begins and ends at the same vertex. In contrary a \de{tree} is an undirected graph in which any two vertices are connected by exactly one path.
+	
+	Considering as example the linear graph in figure \ref{fig:mb:lineargraph-b} we conventionally denote with $h$ the edges associated to kinematic equation (that are strictly related to the mechanical joints), with $r$ the edges representing fixed transformations between two reference frames in a body, with $b$ the time-varying transformation between the body reference frame respect to ground. Auxiliary edges $a$ might be required to describe the transformations between reference frames that are not directly connected.
+	
+	\begin{SCfigure}[2][bht]
+		\centering \includegraphics[width=5cm]{lineargraph-b}
+		\caption{linear graph of the slider-crank mechanism of figure \ref{fig:mb:lineargraph}.} \label{fig:mb:lineargraph-b}
+	\end{SCfigure}
+	
+	\paragraph{Tree and closed loops} A graph is a \textit{topological tree} if there exists exactly one path between any two nodes in the graph. If so the connectivity graph of a rigid body system is a topological tree then such system is regarded as a \textbf{kinematic tree}. Such kind of graphs have special properties that make it easy to calculate their dynamics efficiently.\\
+	Moreover a \textbf{spanning tree} of a graph $G$, denoted as $G_t$, is a sub-graph of $G$ containing all the nodes in $G$ together with any subset of the arcs in $G$ such that $G_t$ is a topological tree (as in figure \ref{fig:mb:spanningtree}); is is so proven that each connectivity graph has at least one spanning tree and if $G$ is already a tree, then $G_t = G$ (in all other case the spanning trees are not unique).
+	
+	\begin{SCfigure}[2][bht]
+		\centering \includegraphics[width=0.48\linewidth]{spanning}
+		\caption{example of a graph that's not a topological tree (left) and all possible spanning trees (right).}
+		\label{fig:mb:spanningtree}
+	\end{SCfigure}
+
+	A \textbf{cycle} is instead a closed path in a graph, hence a tree (to be so) must present no cycles. Each cycle in a connectivity graph defines a \textbf{kinematic loop}, however not all of them are useful: only the independents one must be used for the description of the system. For equation of motion only the minimal set of loops must be used. If a system has a kinematic loop then it's referred as \textbf{closed-loop system}.
+	
+\subsection{Global and recursive approaches}
+	\subsubsection{Recursive formulation}
+		In a \de{recursive approach} to solve the kinematic of a system we firstly need to generate a linear graph that's a tree in order so to have an open-loop system. The idea is so to determine a sequence of nodes (starting from ground for simplicity) and then follow the kinematic chain by applying all the transformation. Following such sequence we build reference frames on top of each others: each edge $h$ is so a transformation matrix that introduces one or more generalized coordinates that are used to describe the motion of the system  (hence describe the relative motion of the joint). Other edges $r$ are instead fixed and are used to \textit{move} inside the body.
 		
-	\textbf{DA RIVEDERE QUESTA PARTE}
-	
-	
+		Such method is characterized by having the minimal number of dependent coordinates; in fact if the linear graph is a tree then the number of coordinates represents the degrees of freedom of the system, while if the multi-body system has some loops we have the introduction of constraints equations.
+		
+		\textbf{AGGIUNGERE ESEMPIO}
+		
+	\subsubsection{Global formulation}
+		Using a \de{global approach} each body is initially considered as free and each body reference frame is described with parametric transformation matrices (respect to ground). Auxiliary reference frames are constructed on top of them and then constraint equations $h$ are applied to \textit{assemble} the mechanism. This approach is characterized by having mainly global coordinates and simpler constraint equations, however it produces a higher number of dependent coordinates (way much more than the degrees of freedom of the system).
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		
