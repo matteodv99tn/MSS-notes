@@ -144,7 +144,9 @@
 		 With such assumption we can compute the Kronecker normal form $\mat{PEQ} = \matrix{\mat N \\ & \mat I}$ and $\mat{PAQ} = \matrix{\mat I \\ & \mat J}$; premultiplying so equation \ref{eq:dae:linear2} by $\mat P$ results in $\mat{PE}\vett y' + \mat{PA}\vett y = \mat P \vett C$.
 	\newcommand{\y}{\vett y} \newcommand{\z}{\vett z} \newcommand{\inv}{^{-1}}
 		Performing the change of variable $\mat Q \z = \y$ (hence $\z = \mat Q\inv$) and observing that $\mat Q \z' = \y'$ we obtain the expression $\mat{PEQ} \z' + \mat{PAQ}\z = \mat P\vett C$ on top of which we can apply the Kronecker normal form:
-		\[ \matrix{\mat N \\ & \mat I} \z' + \matrix{\mat I \\ & \mat J} \z = \mat P \vett C  \]
+		\begin{equation} \label{eq:dae:kroneckernormalform}
+			\matrix{\mat N \\ & \mat I} \z' + \matrix{\mat I \\ & \mat J} \z = \mat P \vett C
+		\end{equation}
 		Splitting both vectors $\vett z = (\vett \alpha,\vett \beta)$ and $\mat P\vett C = (\vett d,\vett e)$ we can rewrite this expression as
 		\[ \matrix{\mat N \\ & \mat I} \vector{\vett \alpha' \\ \vett \beta'} + \matrix{\mat I \\ & \mat J} \vector{\vett \alpha \\ \vett \beta} =\vector{\vett d \\ \vett e}  \]
 		The associated linear system representation is
@@ -165,28 +167,380 @@
 		
 		The order of the nilpotency of the matrix $\mat N$ is the so called \de{index} of the differential algebraic equation (for the linear ones) and is a sort of \textit{measure} of the \textit{difficulty} of solving numerically the DAE. In particular if $p=0$ then what we have is a system of ordinary differential equation while if $p=n$ we have a set of only algebraic equations.
 	
+	\subsection{LU decomposition and Jacobi modification}
+		In general the Kronecker normal form is \textit{hard} to compute; computationally we can use the \textit{simpler} \de{LU decomposition} in order to reduce the index of a differential algebraic equation, or better transform the DAE in an ordinary differential equation. 
+		
+		\paragraph{Recall on the LU decomposition} Considering $ \mat A \in \mathds R^{n\times n}$ a square matrix, then there exists 2 permutation matrices $\mat P,\mat Q$ such that
+		\begin{equation}
+			\mat{PA Q} = \mat{LU}
+		\end{equation}	
+		where $\mat L$ is a \textbf{lower triangular matrix} and $\mat U$ is an \textbf{upper} triangular one (in particular if the matrix $\mat A$ is singular only the first $m<n$ rows of $\mat U$ are non-zero and are still triangular, having a \textit{trapezoidal shape}).
+		
+		In the case that $\mat A$ is non-singular, then the algorithm can be reduced to the form $\mat{PA} = \mat{LU}$; alternatively we can use the \de{Echelon form} determined as $\mat{PA} = \mat{LUQ}^T = \mat L\tilde{\mat U}$. \vspace{3mm}
+		
+		A \textbf{permutation matrix} $S_{ij}$ are used to exchange the $i$-th and $j$-th row/column of a matrix $A$; in particular $S_{ij} A = \tilde A$ results in a swapping of the rows while $A S_{ij} = \tilde{\tilde A}$ is the exchange of the columns $i$ and $j$. Observe that $S_{ij} S_{ij} = \I$ results in the identity matrix and that permutations matrices are symmetric, in the sense that $S_{ij}^T = S_{ij}$.\\
 	
+		With that said if we consider a series of multiplication on permutation matrix we have that
+		\[ P = S_{ij} S_{kl} \dots S_{mp} \qquad \Rightarrow \qquad P^T = S_{mp}^T \dots S_{kl}^T S_{ij}^T = S_{mp} \dots S_{kl} S_{ij} \]
+		because we have that $P^TP=\I$. In general a permutation matrix if a series of product of exchanges collected in a single matrix $P$ such that $P^{-1} = P^T$.
+		
+		\paragraph{Jacobi modification} The main idea of the LU decomposition is to find $n-1$ matrices $\mat L_i$ such that $\mat L_{n-1} \dots\mat  L_2 \mat L_1 \mat{PAQ} = \mat U$ (where $\mat L = ( \mat L_{n-1}\dots \mat L_2\mat L_1)^{-1}$), where $\mat U$ is upper triangular and $L_i$ are all lower ones. The \de{Jacobi modification} leverage the same idea, but the permuted matrix $\mat{PAQ}$ is pre-multiplied by a series of Jordan normal matrices $\mat J_i$ resulting in a matrix of the form:
+		\[ \mat J_n\dots \mat J_2\mat J_1 \mat{PAQ} = \matrix{\begin{array}{c|c}
+			\mat I & \\ \hline 0 & 
+		\end{array}} \]
+		where the \textit{blank spaces} can be filled with non-zero elements.
+
+\section{DAE index and index reduction}
+	As already discussed, a linear differential algebraic equation can be regarded as $\mat E \vett y ' + \mat A \vett y = \vett c(t)$ (where we assume that the pair $(\mat E,\mat A)$ is a regular pencil), then with the Kronecker decomposition we had the formulation shown in equation \ref{eq:dae:kroneckernormalform} (page \pageref{eq:dae:kroneckernormalform}).  That allowed to re-state the original DAE problem into an algebraic part $\vett \alpha = \sum_{j=0}^{p-1} (-1)^j \mat N^j \vett d^{(j)}$ and an ordinary differential one $\vett \beta'(t) + \mat J \vett \beta(t) \vett e(t)$. Deriving the algebraic part evaluates to $\vett \alpha'(t) = \sum_{j=0}^{p-1} (-\mat N)^{j} \vett d^{(j+1)}(t)$, meaning that the Kronecker normal form allows to transform the original DAE problem into a system of ordinary differential equations:
+	\begin{equation}
+		\vector{\vett \alpha' \\ \vett \beta'} + \matrix{0 & 0 \\ 0 &  \mat J} \vector{ \vett \alpha \\ \vett \beta} = \vector{\vett e(t) \\ \sum_{j=0}^{p-1} (-\mat N)^{j} \vett d^{(j+1)}(t) }
+	\end{equation}
+	We can observe so that starting from a linear differential algebraic equation with constant coefficients  $\mat E \vett y ' + \mat A \vett y = \vett c(t)$ we have that after $p$ derivation (where $p$ is the nilpotency order of $\mat N$ in the Kronecker normal form) and \textit{some algebraic manipulation} we obtain an ordinary differential equation; as definition we say that the DAE has a \de{Kronecker index $p$}.
 	
+	\paragraph{Differential index} The minimum number of derivations of the system $\mat E \vett y ' + \mat A \vett y = \vett c(t)$ required to transform the DAE into an ODE is called \de{differential index}.
 	
+	Assuming the general expression $\vett F(\vett y, \vett y', t) = 0$, but also the derivatives $\frac d{dt}\vett F(\vett y,\vett y',t) = \pd{\vett F}{\vett y}\vett y' \pd{\vett F}{\vett y'} \vett y'' + \pd{\vett F}{t}$, $\frac{d^2}{dt^2}\vett F$ up to the $p$-th order $\frac{d^p}{dt^p}\vett F$, such values can be combined to obtain an expression in the form $\vett y' = \vett G(\vett y,t)$. The differential index is the minimum number of derivations $p$ required to transform $\vett F(\vett y,\vett y',t)= 0$ into $\vett g' = \vett G(\vett y,t)$.\\
+	As special cases
+	\begin{itemize}
+		\item if the Kronecker normal form is  of type $\mat{PEQ} = \mat I$ and $\mat{PAQ} = \mat J$, then we have that
+		\begin{align*}
+			\mat{PE }\vett y' + \mat{PA} \vett y & =  \mat P \vett c \\
+			\mat{PEQQ}^T \vett y' + \mat{PAQQ}^T \vett y & = \mat P \vett c \hspace{1.4cm} \leftarrow \quad \vett z = \mat Q^T \vett y \\
+			\mat I \vett z' + \mat J \vett z & = \mat P \vett c \\ \Rightarrow \qquad \vett z' & = \mat P \vett c - \mat J \vett z
+		\end{align*}
+		This is a purely ordinary differential equation.
+		\item alternatively if the Kronecker normal form is such that $\mat{PEQ} = \mat N$ and $\mat{PAQ} = \mat I$, then we have
+		\begin{align*}
+			\mat{PEQQ}^T \vett y' + \mat{PAQQ}^T \vett y & = \mat P \vett c \hspace{1.4cm} \leftarrow \quad \vett z = \mat Q^T \vett y \\
+			\mat N \vett z' + \vett z & = \mat P \vett c = \vett d 
+		\end{align*}
+		Knowing that $\mat N$ is a nilpotent matrix of order $p$, recalling previous \textit{tricks we have that}
+		\[ \vett z = \sum_{j=0}^{p-1} (-\mat N)^j \vett d^{(j)}  \]
+		This is a purely algebraic equation.
+	\end{itemize}
 	
+	\begin{example}{: DAE to ODE}
+		Considering the differential algebraic equation
+		\[ \begin{cases}
+			\dot x_1 + \dot x_2 + x_1 = 1 \\
+			\dot x_1 + \dot x_2 + x_1 + x_2 = t
+		\end{cases} \]
+		subtracting from the second equation the first one results in $x_2 = t-1$ that derived determines $\dot x_2 = 1$: we have so $\dot x_2$ expressed as an ordinary differential equation. Substituting this result in the first equation we have $\dot x_1 + 1 + x_1 = 0$, hence $\dot x_1 = -x_1$. After 1 derivation the resulting ODE is
+		\[ \begin{cases}
+			\dot x_1 = -x_1 \\ \dot x_2 = 1
+		\end{cases} \]
+		The differential index in this case is $1$ (because we only derived $\dot x_2 = t-1$ once).
+	\end{example}
 	
+	\paragraph{Systematic index reduction algorithm} Given a linear DAE with constant coefficients $\mat E \vett y' + \mat A \vett y = \vett c$ (where usually $\mat E$ is singular), we can find two permutation matrices $\mat P, \mat Q$ in order to have the factorization $\mat{PEQ} = \mat{LU}$ where $\mat L$ is lower triangular and $\mat Q$ is \textit{upper trapezoidal} due to singularity of $E$. Knowing that $\mat Q^{-1} = \mat Q^T$, we also have that $\mat{PE} = \mat{LUQ}^T$: this last permutation $\mat Q^T$ corresponds simply to column commutations, meaning that we can regard
+	\[ \mat{PE} = \mat{LUQ}^T = \mat{LM} \]
+	where $\mat M$ is a matrix that in general is composed in two \textit{vertically stacked rectangular blocks}: the upper one that' generally non zero and the lower one identically null, hence $\mat M = \matrix{\begin{array}{c}
+			\mat M_1 \neq 0 \\ \hline \mat M_2 =  0
+	\end{array}}$. With this consideration we can pre-multiply the linear DAE by $\mat L^{-1} \mat P$ what we obtain is the formulation
+	\begin{equation}
+	\begin{split}
+		\mat L^{-1} \mat{PE} \vett y' + \mat L^{-1} \mat{PA} \vett y & = \mat L^{-1} \mat P \vett c \\
+		\mat M \vett y' + \mat N \vett y & = \vett d
+ 	\end{split}
+	\end{equation}
+	Splitting the matrices/vector $\mat M,\mat N, \vett d$ in order to \textit{match} the dimension of the blocks of $\mat M$, then we can consider the initial differential algebraic equations as made of
+	\[ \begin{cases}
+		\mat M_1 \vett y' + \mat N_1 = \vett d_1 \qquad & \textrm{: differential part} \\
+		\mat N_2 \vett y = \vett d_2 & \textrm{: algebraic part}
+	\end{cases} \]
+	The easiest thing to do to reduce the DAE into a system of ordinary differential equation is to derive in time the algebraic part, that evaluates to $\mat N_2 \vett y' = \vett d_2'$: with that we obtain a \textit{pure} system of ordinary differential equations in the form
+	\[ \begin{cases}
+		\mat M_1 \vett y' + \mat N_1 = \vett d_1 \qquad & \textrm{: differential part} \\
+		\mat N_2 \vett y' = \vett d_2' & \textrm{: algebraic part}
+	\end{cases} \]
+	This results in a \textit{new} differential algebraic system in the form $\mat E_1 \vett y' + \mat A_1 \vett y = \vett e_1$ where 
+	\[ \mat E_1 = \matrix{\mat M_1 \\ \mat N_2} \qquad \mat A_1 = \matrix{\mat N_1 \\ 0} \qquad \vett e_1 = \vector{\vett d_1 \\ \vett d_2'} \]
+	The so computed matrix $\mat E_1$ can still be singular, but we can apply this same algorithm until the obtained system is non-singular, hence solvable: the number of required derivations is the \de{index} of the differential algebraic equation.
 	
+	\begin{example}{: index computation and reduction} \label{ex:dae:indexreduction}
+		Considering a differential algebraic system in the form
+		\[ \begin{cases}
+			\dot x_1 + \dot x_2 + \dot x_3 + x_1 = \sin t \\ 
+			\dot x_1 + \dot x_2 + \dot x_3 + x_3 = t \\
+			x_1 + x_3 = \cos t
+		\end{cases} \]
+		in order to perform the index reduction we can rewrite the system in a more \textit{compact} form in order to perform more easily the Gauss-Jordan solution of the system:
+		\begin{align*}
+			& \hspace{2.3mm} \begin{array}{ p{0.7cm} p{0.7cm} p{0.7cm}  p{0.7cm} p{0.7cm} p{0.7cm}  p{1cm} }
+				$\dot x_1$ & $\dot x_2$ & $\dot x_3$ & $x_1$ & $x_2$ & $x_3$ & RHS
+			\end{array} \\
+			 & \left[ \begin{array}{ p{0.7cm} p{0.7cm} p{0.7cm} | p{0.7cm} p{0.7cm} p{0.7cm} | p{1cm} }
+				1 & 1 & 1 & 1 & 0 & 0 & $\sin t$ \\
+				1 & 1 & 1 & 0 & 0 & 1 & $t$ \\
+				0 & 0 & 0 & 1 & 0 & 1 & $\cos t$
+			\end{array} \right]
+		\end{align*}
+		Performing the transformation on the rows of such matrix $(2) \mapsto (2)-(1)$ we obtain the matrix
+		\[ \matrix{ \begin{array}{ ccc | ccc | c }
+				1 & 1 & 1 & 1 & 0 & 0 & \sin t \\
+				0 & 0 & 0 & -1 & 0 & 1 & t-\sin t \\
+				0 & 0 & 0 & 1 & 0 & 1 & \cos t
+		\end{array} } \]
+		Observing that the last two rows are identically zero for what concerns the entries in $\mat E$, then we can derive such algebraic part by \textit{shifting} to the left the block $\mat N_2$ and deriving in time the last column associated to the right hand side $\vett d$, obtaining
+		\[ \matrix{ \begin{array}{ ccc | ccc | c }
+			1 & 1 & 1 & 1 & 0 & 0 & \sin t \\
+			-1 & 0 & 1 & 0 & 0 & 0 & 1-\cos t \\
+			1 & 0 & 1 & 0 & 0 & 0 & -\sin t
+		\end{array} } \]
+		Continuing the Gauss-Jordan reduction
+		\[ \xrightarrow[(3)\mapsto(3)-(1)]{(2)\mapsto(2)+(1)}\matrix{ \begin{array}{ ccc | ccc | c }
+				1 & 1 & 1 & 1 & 0 & 0 & \sin t \\
+				0 & 1 & 2 & 1 & 0 & 0 & 1-\cos t +\sin t \\
+				0 & -1 & 0 & - 1 & 0 & 0 & -2\sin t 
+		\end{array} } \]
+		\[ \xrightarrow[(3)\mapsto(3)+(2)]{(1)\mapsto(1)-(2)}\matrix{ \begin{array}{ ccc | ccc | c }
+			1 & 0 & - 1 & 0 & 0 & 0 & \cos t - 1 \\
+			0 & 1 & 2 & 1 & 0 & 0 & 1-\cos t +\sin t \\
+			0 & 0 & 2 & 0 & 0 & 0 & 1 - \cos t - \sin t
+		\end{array} } \]
+		\[ \xrightarrow[(2)\mapsto(2) - (3)]{(1)\mapsto(1)+\frac 12 (3)}\matrix{ \begin{array}{ ccc | ccc | c }
+			1 & 0 & 0 & 0 & 0 & 0 & \frac{\cos t - \sin t - 1}{2} \\
+			0 & 1 & 0 & 1 & 0 & 0 & 2 \sin t \\
+			0 & 0 & 2 & 0 & 0 & 0 & 1 - \cos t - \sin t
+		\end{array} } \]
+		After all this reductions we obtained a non-singular matrix $\mat E$ determined just after one differentiation of the original problem (hence the index of the DAE is $p=1$) and the resulting ordinary differential equation is
+		\[ \begin{cases}
+			\dot x_1 = \frac 1 2 (\cos t - \sin t -1) \\ \dot x_2 = 2 \sin t - x_1 \\ \dot x_3 = \frac 1 2 (1-\cos t - \sin t)
+		\end{cases} \]
 	
+	\end{example}
 	
+	\paragraph{When the algorithm fails} Considering now a differential algebraic system characterized by the equations
+	\[ \begin{cases}
+		x' + y' + z' + w' + x = t \\
+		x' - x = t^2 \\
+		y' - x = t \\
+		x'+y' = 0
+	\end{cases} \quad \leftrightarrow \quad \matrix{ \begin{array}{ cccc | cccc | c}
+		1 & 1 & 1 & 1 & 1 & 0 & 0 & 0 & t \\
+		1 & 0 & 0 & 0 & -1& 0 & 0 & 0 & t^2 \\
+		1 & 0 & 0 & 0 & -1& 0 & 0 & 0 & t \\
+		1 & 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0
+	\end{array} } \]
+	after some steps in the Jordan-Gauss reduction for linear systems we obtain the form
+	\[ \matrix{ \begin{array}{ cccc | cccc | c}
+			1 & 0 & 0 & 0 & -1 & 0 & 0 & 0 & t^2 \\
+			0 & -1& -1& -1& -2 & 0 & 0 & 0 & t^2-t \\
+			0 & 0 & - 1 &-1 & -1 & 0 & 0 & 0 & -t \\
+			0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & t - t^2
+	\end{array} } \]
+	Clearly the last row is a contradiction, in fact what it says is that $0= t-t^2$ that's not verified in general. This is due to the fact that the initial choice of the pair $(\mat A,\mat E)$ was \textbf{not} a \textbf{regular pencil}: we in fact have that
+	\[ \det(\mat E - \lambda \mat A) = \left| \begin{array}{cccc}
+		1-\lambda & 1 & 1 & 1 \\
+		1+\lambda & 0 & 0 & 0 \\
+		1+\lambda & 0 & 0 & 0 \\
+		1 & 1 & 0 & 0 
+	\end{array} \right| = - \left| \begin{array}{cccc}
+		1+\lambda & 0 & 0  \\
+		1+\lambda & 0 & 0 \\
+		1 & 1 & 0  
+	\end{array} \right| = 0 \]
+	where the expansions used to compute the determinant are made along the last column on each sub-matrix.
 	
+	\paragraph{Linear DAE with non-constant coefficients} Considering the more general case of non-constant coefficient for linear differential algebraic equation, hence in the form $\mat E(t) \vett y' + \mat A \vett y = \vett c$, we might want to know if the condition on the regular pencil $(\mat A,\mat E)$ must still be required. Considering the simple system $\mat E(t) = \matrix{1 & t \\ 0 & 0}$ and $\mat A(t) = \matrix{0 & 0 \\ 1 & t}$ we can show that they are not regular pencil, in fact
+	\[ \det(\mat E-\lambda \mat A) = \left| \begin{array}{cc}
+		1 & t \\ 1-\lambda& t - \lambda
+	\end{array} \right| = t-\lambda - t(1-\lambda) = 0\]
+	However writing explicitly the differential algebraic equation we have
+	\[ \begin{cases}
+		x' + t y' = c_1 \qquad & \textrm{: differential part} \\
+		x + ty = c_2 & \textrm{: algebraic part}
+	\end{cases} \]
+	Deriving in time the algebraic equation results in the system
+	\[ \begin{cases}
+		x' + t y' = c_1 \\ x' + t y' + y = c_2'
+	\end{cases} \qquad \xrightarrow{(2) \mapsto (2)-(1)} \qquad \begin{cases}
+		x' + t y' = c_1 \\
+		y = c_2'- c_1
+	\end{cases}\]
+	Deriving one more time the second equation (that's algebraic) allows to compute a \textit{non-singular} system of ODEs characterized by solutions
+	\[ y' = c_2'' - c_1' \qquad x' = c_1 - \big(c_2''-c_1'\big)t \]	
+	The index of the original DAE is so 2.\\
+	In general not being regular pencil for non-constant linear DAEs is not a problem; in fact the the system $\mat E(t)\vett x' + \mat A(t) \vett x = \vett c$, after some algebraic manipulation, can be reduced to a form
+	\[ \matrix{\tilde{\mat E}_1(t) \\ 0 } \vett x' + \matrix{\tilde{\mat A}_1(t) \\ \tilde{\mat A}_2(t) } \vett x = \vector{\tilde{\vett c}_1 \\ \tilde{\vett c}_2 } \]
+	Deriving the algebraic part this time doesn't mean just \textit{shifting} $\tilde{\mat A}_2(t)$ on the left to complex the matrix $\tilde{\mat E}$, but also introduces the derivative of the entries of $\tilde{\mat A_2}(t)$:
+	\[ \matrix{\tilde{\mat E}_1(t) \\ \tilde{\mat A}_2(t) } \vett x' + \matrix{\tilde{\mat A}_1(t) \\ \tilde{\mat A}_2'(t) } \vett x = \vector{\tilde{\vett c}_1 \\ \tilde{\vett c}_2' } \]
+	This makes the system in general non-singular, having the possibility always to have a solution.
 	
+	\paragraph{Tricks in the computation} Recalling example \ref{ex:dae:indexreduction}, after writing the linear system we described it in a \textit{unique} matrix containing both matrices $\mat E,\mat A$ and the right-hand side of the equation. This can be done for linear system, however we can note that the Gauss reduction is performed on the matrix $\mat E$ in order to obtain a form $\matrix{\mat I \\ & \mat 0}$. The general idea is so to compute the Gauss steps on the system
+	\[ \matrix{ \ \mat E \ | \ \mat  I \ } \quad \xrightarrow{\textrm{Gauss  reduction}} \quad  \matrix{\ \mat T_m\dots \mat T_2 \mat T_1 \mat E \ | \ \mat T_m\dots \mat T_2 \mat T_1 \mat  I\ } =  \left[ \begin{array} {c  c |} 
+		\mat I & \\ & \mat 0
+	\end{array} \hspace{2mm} \mat T \hspace{2mm} \right] \]
+	With such transformation matrix $\mat T$ computing $\mat {TE} \vett y' + \mat{TA} \vett y = \mat T \vett c$ results in a separation of the differential part from the algebraic one and we can apply the algorithm (by deriving the algebraic part and iterate).
 	
+	\begin{example}{: simple pendulum and index reduction}
+		Recalling the simple pendulum described at the start of this chapter, we retrieved the differential algebraic equation describing the system as
+		\[ \begin{cases}
+			x' = u \\ y' = v \\ m y' + \lambda x = 0 \\ m v' + \lambda y = - mg \\ x^2 + y^2 - l^2 = 0
+		\end{cases} \]
+		Describing the time-dependent coordinates in the vector $\vett z' = (x,y,u,v,\lambda)$, the first thing to to is to re-state the problem in a form $\mat E(\vett z,t) \vett z' = \vett G(\vett z, t)$, so
+		\[ \matrix{ 1  \\ & 1 \\ && m \\ &&& m \\ &&&& 0 } \vector{x' \\ y' \\ u' \\ v' \\ \lambda'} = \vector{u \\ v \\ -\lambda x \\ -\lambda y - mg \\ l^2 - x^2 - y^2} \]
+		Exploiting the yet-described trick we consider the linear system
+		\[ \matrix{\begin{array} {ccccc | ccccc}
+			1 &&&&& 1 \\
+			& 1 &&&&& 1 \\
+			&& m &&&&& 1 \\
+			&&& m &&&&& 1 \\
+			&&&& 0 &&&&& 1 \\
+		\end{array}} \]
+		The first step of the index reduction is quite simple and consists in the multiplication by $\frac 1 m$ of both the $3^{rd}$ and $4^{th}$ rows, resulting in
+		\[ \left[ \begin{array} {c  c |} 
+			\mat I & \\ & \mat 0
+		\end{array} \hspace{3mm} \mat T_1 \hspace{2mm} \right] = \matrix{\begin{array} {ccccc | ccccc}
+			1 &&&&& 1 \\
+			& 1 &&&&& 1 \\
+			&& 1 &&&&& \frac 1m \\
+			&&& 1 &&&&& \frac 1m \\
+			&&&& 0 &&&&& 1 \\
+		\end{array}}  \]
+		Applying the transformation matrix $\mat T$ on the initial system determines so the form
+		\[ \matrix{ 1  \\ & 1 \\ && 1 \\ &&& 1 \\ &&&& 0 } \vector{x' \\ y' \\ u' \\ v' \\ \lambda'} = \mat T_1 \vett G = \vector{u \\ v \\ - \frac \lambda m x \\ -\frac \lambda m  y - g \\ l^2 - x^2 - y^2} = \vett G_1 \]
+		Deriving with respect to time the algebraic equation (that's only the last row) evaluates to $\frac{d}{dt}\big(l^2 - x^2 - y^2\big) = - 2xx' - 2y y'$; this determines the new system
+		\[ \matrix{ 1  \\ & 1 \\ && 1 \\ &&& 1 \\ -2x & -2y & 0 & 0 & 0 } \vector{x' \\ y' \\ u' \\ v' \\ \lambda'} = \vector{u \\ v \\ - \frac \lambda m x \\ -\frac \lambda m  y - g \\ 0} \]
+		
+		We can apply the same method to reduce this system, by so determining a second transformation matrix $\mat T_2$ for this system using the Gauss reduction:
+		\[ \matrix{\begin{array} {ccccc | ccccc}
+				1   &&&&& 1 \\ 
+				& 1 &&&&& 1 \\ 
+				&& 1 &&&&& 1 \\ 
+				&&& 1 &&&&& 1 \\ 
+				-2x & -2y & 0 & 0 & 0 &&&&& 1
+		\end{array}} \]
+		\[ \xrightarrow{(5) \mapsto (5) + 2x (1) + 2 y(1)}\matrix{\begin{array} {ccccc | ccccc}
+			1 &&&&& 1 \\ 
+			& 1 &&&&& 1 \\ 
+			&& 1 &&&&& 1 \\ 
+			&&& 1 &&&&& 1 \\ 
+			0 & 0 & 0 & 0 & 0 &2x& 2y & 0 & 0 & 1
+		\end{array}} \]
+		This new transformation matrix $\mat T_2$ determines a  new system
+		\[ \matrix{ 1  \\ & 1 \\ && 1 \\ &&& 1 \\ &&&& 0 } \vector{x' \\ y' \\ u' \\ v' \\ \lambda'} = \mat T_2 \vett G_1 = \vector{u \\ v \\ - \frac \lambda m x \\ -\frac \lambda m  y - g \\ 2xu + 2yv} = \vett G_2 \]
+		Deriving the algebraic part $\frac d{dt}(2xu + 2yv) = 2x'u +2x u' + 2y'v + 2yv'$ determines a new differential matrix $\mat E_3$ that can so be reduced using the Gauss method:
+		\[ \matrix{\begin{array} {ccccc | ccccc}
+				1   &&&&& 1 \\ 
+				& 1 &&&&& 1 \\ 
+				&& 1 &&&&& 1 \\ 
+				&&& 1 &&&&& 1 \\ 
+				2u & 2v & 2x & 2y & 0 &&&&& 1
+		\end{array}} \]
+		\[ \xrightarrow{(5) \mapsto (5) -2u (1) -2v (1) - 2x(3) - 2y(4)}\matrix{\begin{array} {ccccc | ccccc}
+				1 &&&&& 1 \\ 
+				& 1 &&&&& 1 \\ 
+				&& 1 &&&&& 1 \\ 
+				&&& 1 &&&&& 1 \\ 
+				0 & 0 & 0 & 0 & 0 &-2u& -2v & -2x & -2y & 1
+		\end{array}} \]
+		determining
+		\[ \matrix{ 1  \\ & 1 \\ && 1 \\ &&& 1 \\ &&&& 0 } \vector{x' \\ y' \\ u' \\ v' \\ \lambda'} = \mat T_3 \vett G_2 = \vector{u \\ v \\ - \frac \lambda m x \\ -\frac \lambda m  y - g \\ -2u^2 - 2v^2 +2 \frac \lambda m x^2 + 2 \frac \lambda m y^2 +2 yg} = \vett G_3 \]
+		Deriving one more time the lonely algebraic equation results in
+		\[ \frac d{dt} \left( -2u^2 - 2v^2 +2 \frac \lambda m x^2 + 2 \frac \lambda m y^2 +2 yg \right) = 2 \lambda' \frac{x^2 + y^2}{m} + 4\lambda \frac{x x' + yy'}{m} -4 uu' - 4 vv' +2y'g \]
+		We so reduce the system
+		\[ \matrix{\begin{array} {ccccc | ccccc}
+				1   &&&&& 1 \\ 
+				& 1 &&&&& 1 \\ 
+				&& 1 &&&&& 1 \\ 
+				&&& 1 &&&&& 1 \\ 
+				4\frac \lambda m x & 4 \frac \lambda m y + 2g & -4u & -4v & 2\frac{x^2+y^2}{m} &&&&& 1
+		\end{array}} \]
+		\[ \xrightarrow{(5) \mapsto (5) - 4\frac \lambda m x  (1) - \left(4 \frac \lambda m y + 2g \right) (2) +4u (3) +4v(4)}\matrix{\begin{array} {ccccc | ccccc}
+				1 &&&&& 1 \\ 
+				& 1 &&&&& 1 \\ 
+				&& 1 &&&&& 1 \\ 
+				&&& 1 &&&&& 1 \\ 
+				0 & 0 & 0 & 0 & 2\frac{x^2+y^2}{m} & - 4\frac \lambda m x & - 4 \frac \lambda m y - 2g &  4u & 4v & 1
+		\end{array}} \]
+		\[ \xrightarrow{(5) \mapsto \frac m{2(x^2+y^2)}(5)}\matrix{\begin{array} {ccccc | ccccc}
+			1 &&&&& 1 \\ 
+			& 1 &&&&& 1 \\ 
+			&& 1 &&&&& 1 \\ 
+			&&& 1 &&&&& 1 \\ 
+			0 & 0 & 0 & 0 & 1 & - \frac{2 \lambda x}{x^2 + y^2} & - \frac{2\lambda y}{x^2+y^2} - \frac{mg}{x^2+y^2} & \frac{2mu}{x^2+y^2} & \frac{2mv }{x^2 + y^2} & \frac{m}{2(x^2+y^2)}
+		\end{array}} \]
+		Finally we have a transform matrix $\mat E$ that's non-singular and the ordinary differential equation originated from the initial DAE is so
+		\[ \matrix{ 1  \\ & 1 \\ && 1 \\ &&& 1 \\ &&&& 1 } \vector{x' \\ y' \\ u' \\ v' \\ \lambda'} = \mat T_4 \vett G_3 = \vector{u \\ v \\ - \frac \lambda m x \\ -\frac \lambda m  y - g \\ \frac{-4\lambda(xy + yv) - 3mgv}{x^2 + y^2} } \]
+	\end{example}
+
+\subsection{Introduction of dummy variables}
+	Considering the following differential algebraic equation retrieved by a fairly simple mechanical system that's in the form
+	\begin{equation} \label{eq:dae:dummyinitial}
+	\begin{cases}
+		x_1' = u_1 \\ y_1' = v_1 \\ x_2' = u_2 \\
+		u_1' = 2 \lambda_1 (x_1-x_2) + 2\lambda_2 x_1 \\
+		v_1' = 2 y_1(\lambda_1 - \lambda_2) - y \\
+		u_2' = 2 \lambda_2 (x_2 - x_1) \\
+		x_1^2 + y_1^2 - 1 = 0 \\
+		(x_1-x_2)^2 + y_1^2 - 1 = 0
+	\end{cases}
+	\end{equation}
+	The difficult part for manually solving this problems lies in the implicit differentiation of the right hand sides of the ODEs: the three ones are quite simple (in fact $\frac d{dt}x_1' = u_1'$) while the others are more complex ($\frac d{dt}u_2' = 2\lambda_2'(x_2-x_1) + 2\lambda_2(x_2'-x_1')$) and so is not in general a good idea to perform the index reduction on such system (because each steps requires the differentiation in time, increasing the complexity of the calculations).\\
+	The idea is so to introduce some \textbf{\textit{dummy variables}} in the form $\dot z$ that allows to rewrite the second three ODEs as
+	\[ u_1' = \dot u_1 \qquad v_1' = \dot v_1 \qquad u_2' = \dot u_2 \] 
+	subjected to the following algebraic constraints:
+	\[ 0 = 2\lambda_1(x_1-x_2) + 2 \lambda_2 x_1 - \dot u_1 \qquad 0 = 2y_1(\lambda_1-\lambda_2) - y - \dot v_1 \qquad 0 =  2\lambda_2 (x_2-x_1) - \dot u_2  \]
+	With this idea the initial differential algebraic equation can be regarded as
+	\begin{equation} 
+		\left\{ \begin{aligned}
+			&\left. \begin{aligned}
+				x_1' = u_1 \\ y_1' = v_1 \\ x_2' = u_2 \\ u_1' = \dot u_1 \\ v_1' = \dot v_1 \\ u_2' = \dot u_2
+			\end{aligned} \hspace{42mm} \right\} &&\textrm{: simpler ODE part} \\
+			&\left. \begin{aligned}
+				&0 = 2\lambda_1(x_1-x_2) + 2 \lambda_2 x_1 - \dot u_1 \\
+				&0 = 2y_1(\lambda_1-\lambda_2) - y - \dot v_1 \\
+				&0 =  2\lambda_2 (x_2-x_1) - \dot u_2
+			\end{aligned} \qquad \right\} &&\textrm{: additional algebraic constraint} \\
+			&\left. \begin{aligned}
+				&0 = x_1^2 + y_1^2 - 1 \\
+				&0 = (x_1-x_2)^2 + y_1^2 - 1
+			\end{aligned} \hspace{18.5mm} \right\} &&\textrm{: original algebraic constraint}
+		\end{aligned} \right. 
+	\end{equation}
+	In order to reduce the index we can so differentiate in time the algebraic constraints: starting off with the newly added one what we obtain is (mathematical simplification are already performed)
+	\begin{align*}
+		\frac d{dt} \big( 2\lambda_1(x_1-x_2) + 2 \lambda_2 x_1 - \dot u_1 \big) & = 2 \lambda_1' (x_1-x_2) + 2\lambda_1(u_1 - u_2) + 2 \lambda_2' x_1 + 2\lambda_2 u_1 + \dot u_1' \\
+		\frac d{dt} \big( 2y_1(\lambda_1-\lambda_2) - y - \dot v_1 \big) & = 2v_1 (\lambda_1 - \lambda_2) +2 y_1(\lambda_1'-\lambda_2') - \dot v_1' \\
+		\frac d{dt} \big( 2\lambda_2 (x_2-x_1) - \dot u_2 \big) & = 2\lambda_2' (x_2 - x_1) + 2 \lambda_2(u_2 - u_1) - \dot u_2'
+	\end{align*}
+	In this case the differentiation already presents differential terms (in the variables $\dot u_1', \dot v_1', \dot u_2', \lambda_1', \lambda_2'$) and so \textit{it doesn't make sense} to continue with the differentiation in time of this expressions. Differentiating instead the \textit{original} algebraic constraints what we obtain is
+	\begin{align*}
+		\frac d{dt} \big( x_1^2 + y_1^2 \big) & = 2x_1 x_1' + 2 y_1 y_1' = 2x_1 u_1 + 2 y_1 v_1 && (a) \\
+		\frac d{dt} \big( (x_1-x_2)^2 + y_1^2 - 1 \big) & = 2(x_1-x_2)(x_1'-x_2') +2 y_1 y_1' = 2(x_1-x_2)(u_1-u_2) + 2y_1 v_1 &&(b)
+	\end{align*}
+	This equations (after substituting all the variables $x_i' = u_i$) presents no differential part, hence we have to reduce one more time the index by differentiating only this two algebraic equations in time:
+	\begin{align*}
+		\frac d{dt}(a) & = 2 u_1^2 + 2x_1 \dot u_1 + 2 v_1^2 + 2 y_1 \dot v_1 && (c)\\
+		\frac d{dt}(b) & = 2 (u_1 - u_2)^2 + 2 (x_1 - x_2)(\dot u_1 - \dot u_2) +2 v_1^2 +2 y_1 \dot v_1  && (d) \\
+	\end{align*}
+	We still need to reduce the index (because this expression are still algebraic) and after this more differentiation we finally obtain an ordinary differential equation:
+	\begin{align*}
+		\frac d{dt}(c) & = 6 u_1 \dot u_1 + 6 v_1\dot v_1 + 2 x_1 \dot u_1' + 2 y_1 \dot v_1' \\
+		\frac d{dt}(d) & = 6(u_1-u_2)(\dot u_1 - \dot u_2) + 6 v_1\dot v_1 + 2 (x_1 -x_2)(\dot u_1' - \dot u_2') + 2 y_1 \dot v_1' \\
+	\end{align*}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	Ended the index reduction used to transform the algebraic constraints in ordinary differential part, we can rewrite such obtained ODEs in a matrix form as
+	\[ \underbrace{ \matrix{ 2(x_1-x_2) & 2x_1 & - 1 & 0 & 0 \\
+	2y_1 & -2y_1 & 0 & - 1 & 0 \\
+	0 & -2(x_1-x_2) & 0 & 0 & -1 \\ 
+	0 & 0 & 2x_1 & 2y_1 & 0 \\
+	0 & 0 & 2(x_1 x_2) & 2y_1 & - 2(x_1 - x_2) } }_{\mat E} \underbrace{\vector{\lambda_1' \\ \lambda_2' \\ \dot u_1' \\ \dot v_1' \\ \dot u_2'}}_{\vett z'} = \underbrace{\vector{2\lambda_2 (u_2-u_1) - 2 \lambda_2 u_1 \\
+	2v_1(\lambda_2 - \lambda_1) \\ 2 \lambda_2 (u_1- u_2) \\ -6u_1 \dot u_1 - 6v_1 \dot v_1 \\ - 6(u_1-u_2)(\dot u_1 - \dot u_2) - 6 v_1 \dot v_1} }_{\vett G} \]
+	After all this steps we can so consider that the equivalent ordinary differential system of the initial DAE problem reported in equation \ref{eq:dae:dummyinitial} is the one determined as
+	\begin{equation}
+	\begin{cases}
+		x_1' = u_1 \\ y_1' = v_1 \\ x_2' = u_2 \\ u_1' = \dot u_1 \\ v_1' = \dot v_1 \\ u_2' = \dot u_2 \\
+		\mat E \vett z' = \vett G
+	\end{cases}
+	\end{equation}
+	The initial condition of such ordinary differential equation satisfy the hidden \textit{original} constraints
+	\[ 0 = x_1^2 + y_1^2 - 1 \qquad 0 = (x_1-x_2)^2 + y_1^2 - 1 \]
+	\[ 0 = 2\lambda_1(x_1-x_2) + 2 \lambda_2 x_1 - \dot u_1 \qquad 0 = 2y_1(\lambda_1-\lambda_2) - y - \dot v_1 \qquad 0 =  2\lambda_2 (x_2-x_1) - \dot u_2  \]
+	but also the expression retrieved while performing the index reduction on the system $(a),(b),(c),(d)$, so
+	\[ 2x_1u_1 + 2 y_1 v_1 = 0 \qquad 2(x_1-x_2)(u_1-u_2) + 2 y_1 v_1 = 0 \]
+	\[ 2 u_1^2 + 2x_1 \dot u_1 + 2 v_1^2 + 2 y_1 \dot v_1 = 0 \qquad 2 (u_1 - u_2)^2 + 2 (x_1 - x_2)(\dot u_1 - \dot u_2) +2 v_1^2 +2 y_1 \dot v_1 = 0   \]
 	
 	
 	
