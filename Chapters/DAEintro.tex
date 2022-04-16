@@ -541,6 +541,49 @@
 	but also the expression retrieved while performing the index reduction on the system $(a),(b),(c),(d)$, so
 	\[ 2x_1u_1 + 2 y_1 v_1 = 0 \qquad 2(x_1-x_2)(u_1-u_2) + 2 y_1 v_1 = 0 \]
 	\[ 2 u_1^2 + 2x_1 \dot u_1 + 2 v_1^2 + 2 y_1 \dot v_1 = 0 \qquad 2 (u_1 - u_2)^2 + 2 (x_1 - x_2)(\dot u_1 - \dot u_2) +2 v_1^2 +2 y_1 \dot v_1 = 0   \]
+
+\subsection{Kernel computation and index reduction}
+	Given a differential algebraic equation $\mat E(t,\vett y) \vett y' = \vett G(t,\vett y)$, if the matrix $\mat E$ is singular then it means that exists at least one vector $\vett v \neq 0$ such that $\mat E \vett v = 0$. This operation is indeed the \textbf{kernel computation} of the matrix $\mat E$. We define the \de{kernel} of such matrix the sub-space described by the set
+	\[ \ker\{\mat E\} = \big\{ \vett v \textrm{ such that } \mat E \vett v = 0 \} = \textrm{span}\{\vett v_1, \dots , \vett v_k\}  \]
+	where the vectors $\vett v_1,\dots, \vett v_k$ are determining a basis of $\ker\{\mat E\}$. Computing the kernel of $\mat E^T$ evaluates to $\ker\{\mat E^T\} = \{ \vett w \ | \ \vett w^T \mat E = 0 \} = \textrm{span}\{\vett w_1^T,\dots, \vett w_p^T\}$. Building so the matrix $\mat K = \matrix{\vett w_1 & \dots & \vett w_p}$ (considering all the vectors of the basis of $\ker\{\mat E^T\}$) as the \textit{concatenations of the vectors $\vett w_i$} implies that
+	\[ \mat K^T \mat E = \matrix{ \vett w_1^T \mat E \\ \vdots \\ \vett w_p^T \mat E } = \vector{0 \\ \vdots  \\ 0} \]
+	
+	The main idea is that if we are indeed able to compute such matrix $\mat K$ associated to the kernel of $\mat E^T$, then we have a way to easily compute the invariant of the differential algebraic equation, in fact 
+	\[ \mat K^T(t,\vett y)\Big(\mat E(t,\vett y) \vett y' = \vett G(t,\vett y) \Big) \qquad \Rightarrow \qquad \vett 0 = \mat K^T(t, \vett y)  \vett G(t,\vett y)\]
+	
+	In general $\mat K \in \mathds R^{n\times p}$ is a rectangular matrix (where $p < n$) and so if we can determine a matrix $\mat L \in \mathds R^{n\times (p-n)}$ such that $\mat M = \matrix{\mat K & \mat L} \in \mathds R^{n\times n}$ is non-singular, then we can observe that we can separate the algebraic part of the DAE from the differential part, in fact
+	\begin{align*}
+		\mat M^T\Big(  \mat E \vett y' & = \vett G \Big) \\
+		\mat M^T \mat E \vett y' & = \mat M^T \vett G \qquad \Rightarrow \begin{cases}
+			\cancel{\mat K^T \mat E \vett y'} = \mat K^T \vett G \\ \mat L^T \mat E \vett y' = \mat L^T \vett G
+		\end{cases}
+	\end{align*}
+	that can be reduced to a form
+	\begin{equation}
+	\begin{cases}
+		\tilde{\mat E}_1 \vett y' = \tilde{\vett G}_1  \qquad & \textrm{differential part}\\ 0 = \tilde{\vett G}_2 & \textrm{algebraic part}
+	\end{cases}
+	\end{equation}
+	We have so separated the algebraic part from the differential one, so we can differentiate this second one in order to reduce the index and obtain a system in the form
+	\[ \begin{cases}
+		\tilde{\mat E}_1 \vett y' = \tilde{\vett G}_1 \\
+		\tilde{\mat E}_1 \vett y' = \tilde{\vett G}_1  
+		-\pd{\tilde{\vett G}_2}{\vett y} \vett y' = \pd{\tilde{\vett G}_2}{t} 
+	\end{cases} \]
+	This newly constructed differential algebraic problem can be reduce following the same procedure until when the kernel of $\mat E^T$ has a null dimension (it is composed only by the zero vector).
+	
+	\paragraph{Computation of the kernel} With this premise being said, we have to find a way to compute the kernel of the square matrix $\mat E$; this can be achieved, as example, using the LU decomposition. Considering in fact the decomposition $\mat{PEQ} = \mat {LU}$ (where $\mat P, \mat Q$ are permutation matrices), as was previously discussed, can be inverted to a form $\mat E = \mat P^{-1} \mat{LUQ}^{-1} = \mat P^{-1} \mat L M$ where $\mat M$ can has the \textit{upper rectangle} that's non-null and the lower one that's null (so is in the form $\mat M = \matrix{\mat M_1 \\ 0}$); knowing that $\mat L$ is non-singular (for the definition of the LU decomposition), then also $\mat P^{-1} \mat L$ is nonsingular and so we can build the matrix
+	\[ \mat M = \mat L^{-1} \mat{PE} = \matrix{\mat M_1 \\ 0} \]
+	Multiplying by appropriately matrices of the form $\matrix{\I & 0 }$ and $\matrix{0 & \I}$ this expressions we can observe that 
+	\begin{align*}
+		\underbrace{\matrix{\I & 0 } \mat L^{-1} \mat P}_{=\mat R^T} \mat E = \matrix{\I & 0} \matrix{\mat M_1 \\ 0} & = \mat M_1 \neq 0 \\
+		\underbrace{\matrix{0 & \I } \mat L^{-1} \mat  P}_{=\mat K^T}  \mat E = \matrix{0 & \I } \matrix{\mat M_1 \\ 0} & = 0 
+	\end{align*}
+	This method allowed us to compute the required matrices as $\mat K = \mat P^T \mat L^{-T} \matrix{0 \\ \I}$ and $\mat R = \mat P^T \mat L^{-T} \matrix{\mat I \\ 0}$ that \textit{stacked} determined the non-singular matrix $\matrix{\mat K & \mat R} = \mat P^T \mat L^{-T} \matrix{0 & \I \\ \I & 0}$.
+	
+	
+	
+	
 	
 	
 	
