@@ -581,7 +581,83 @@
 	\end{align*}
 	This method allowed us to compute the required matrices as $\mat K = \mat P^T \mat L^{-T} \matrix{0 \\ \I}$ and $\mat R = \mat P^T \mat L^{-T} \matrix{\mat I \\ 0}$ that \textit{stacked} determined the non-singular matrix $\matrix{\mat K & \mat R} = \mat P^T \mat L^{-T} \matrix{0 & \I \\ \I & 0}$.
 	
+\section{Semi-explicit form}
+	Given a differential algebraic equation in the form $\vett F(\vett z,\vett z', t) = 0$ that can be expressed as
+	\[ \begin{cases}
+		\vett x' & = \vett f(\vett x, \vett y, t) \\ 0 & = \vett g(\vett x, \vett y, t)
+	\end{cases} \]
+	where $\vett x$ and $\vett y$ are respectively the differential and algebraic variables of the problem and are such that $\vett z = (\vett x , \vett y)$. Let us so consider $x \subseteq z$ the variables in $\vett F(\vett z,\vett z', t)$ that are appearing as derivative, then we can defined $\vett x'$ as $\dvett x$ thus
+	\[ \vett F(\vett z, \vett z', t) = \vett F(\vett z, \dvett x, t) = \vett F (\vett x, \vett y, \dvett x, t) = 0 \]
+	This can be rewritten as
+	\[ \begin{cases}
+		\vett x' & = \dvett x \\
+		0 & = \vett F(\vett x, \vett y, \dvett x, t)
+	\end{cases} \]
+	Moreover calling $\vett w = (\dvett x, \vett y)$ what we obtain is a \textbf{differential algebraic equation} in the so called \de{semi-explicit form}:
+	\begin{equation}
+	\begin{cases}
+		\vett x & = \dvett x = \vett H(\vett x, \vett w, \vett t) \\
+		0 & = \vett G(\vett x, \vett w, t)
+	\end{cases}
+	\end{equation}
+
+	\paragraph{Semi-explicit DAE of index 1} Considering a DAE in the form
+	\[ \begin{cases}
+		\vett x' & = \vett f(\vett x, \vett y, t) \\ 0 & = \vett g(\vett x, \vett y, t)
+	\end{cases} \]
+	then if it is possible to solve $\vett g$ to obtain $\vett y$ so in the form $\vett y = \vett H(\vett x, t)$, then what we have is that $\vett g\big(\vett x, \vett H(\vett x, t), t\big) = 0$ for all values $\vett x, t$, and so we can consider the DAE as
+	\[ \begin{cases}
+		\vett x' & = \vett f(\vett x, \vett y, t) \\ \vett y & = \vett H(\vett x, t)
+	\end{cases} \] 
+	Differentiating the second equation (the algebraic part) in time determines
+	\[ \vett y ' = \frac{d\vett H (\vett x, t)}{dt} = \pd{\vett H(\vett x, t)}{\vett x} \vett x' + \pd{\vett H(\vett x,t)}{t} = \pd{\vett H(\vett x, t)}{\vett x} \vett f(\vett x, \vett y, t) + \pd{\vett H(\vett x,t)}{t} = \vett L(\vett x, \vett y, t)  \]
+	and so the differential algebraic equation after one differentiation (so with a index reduction) becomes
+	\[ \begin{cases}
+		\vett x' & = \vett f(\vett x, \vett y, t) \\ \vett y' & = \vett L(\vett x, \vett y, t)
+	\end{cases} \] 
+	In general an ODE in semi-explicit form of index 1 can be solved without performing the derivation by simply considering
+	\begin{equation} \label{eq:dae:semiexplicitsubs}
+		\vett x' = \vett f(\vett x, \vett y, t) = \vett f\big(\vett x, \vett H(\vett x, t), t\big) = \tilde{\vett f}(\vett x, t)
+	\end{equation}
+\subsection{Implicit function theorem}
+	Equation \ref{eq:dae:semiexplicitsubs} relies on the fact that from $\vett g ( \vett x, \vett y, t) = 0$ allows us to extract the map $\vett H(\vett x,t)$ that allows to explicitly compute $\vett y$ (so satisfying $\vett g\big(\vett x, \vett H(\vett x, t), t\big) = 0$), however up to now we cannot be sure that such map $\vett H$ really exists.
 	
+	\paragraph{Simplified version} Considering a function $f(x,y) \in \mathcal C^1(\mathds R^2)$ and a point $(x_0,y_0)$ such that $f(x_0,y_0) = 0$ and $\pd f y(x_0,y_0) \neq 0$, then there exists an open interval $(x_0-\delta, x_0+\delta)$ such that
+	\[ y = H(x) \qquad \textrm{and} \qquad f\big(x, H(x)\big) = 0 \quad \forall x \in (x_0-\delta, x_0 +\delta) \]
+	Moreover we have that
+	\begin{equation}
+		\frac{dH(x)}{dx} = - \left(\pd{f(x,y)}{y}\right)^{-1} \pd{f(x,y)}{x}
+	\end{equation}
+	
+	Considering the simple example of the function $f(x,y) = y^2 - x$, the point $(x_0,y_0) = (1,1)$ satisfies the conditions of the implicit function theorem, in fact
+	\[ f(x_0,y_0) = 0 \qquad \textrm{and} \qquad \left.\pd{f}{y}\right|_{x = x_0,y = y_0} = 2y \Big|_{x = 1,y = 1} = 2 \neq 0 \]
+	then we are sure that there exists a matrix $H$ that allows to express $y$ as function of $x$, in fact rewriting $y^2 = x$ and so $y = \pm \sqrt x$. The choice of the sign strictly depends on the value of the point $(x_0,y_0)$: in this case we have that $y = H(x) = \sqrt x$. In contrary, if we would have chosen the initial point $(x_0,y_0) = (1,-1)$ the condition for the theorem would have been still verified but the resulting map would have been $y = - \sqrt x$.\\
+	Choosing instead the point $(x_0,y_0) = (0,0)$ would have resulted in the violation of the condition $\pd f y \neq 0$, thus the theorem cannot be applied: in such point we can't in fact discriminate the sign of the map $y = \pm \sqrt x$. However by inverting $x$ and $y$ in the definition, we can define a map $H(y)$ that determines $x$, in fact
+	\[ f(0,0) = 0 \qquad \text{and} \qquad \left.\pd{f}{x}\right|_{x = x_0,y = y_0} = 1 \neq 0 \]
+	and so $x = H(y) = y^2$.
+	
+	\paragraph{Implicit function theorem} Given a function $\vett f : \mathcal A \subseteq \mathds R^{n+m} \rightarrow \mathds R^m$ (where $n,m$ are respectively the number of \textit{independent} and \textit{dependent} variables) and a point $(\vett x_0,\vett y_0) \in \mathcal A$ (with $\vett x_0 \in \mathds R^n,\vett y_0\in \mathds R^m$) such that $\vett f(\vett x_0,\vett y_0) = 0$ and the matrix $\pd{\vett f}{\vett y}(\vett x_0,\vett y_0)$ is non-singular, then there exists two open sets $\mathcal U \subseteq \mathds R^n,\mathcal V \subseteq \mathds R^m$ on top of which is defined a map $\vett \phi: \mathcal U \rightarrow \mathcal V$, $\vett \phi \in \mathcal C^1(\mathcal U,\mathcal V)$, such that
+	\[ \vett y_0 = \vett \phi(\vett x_0) \qquad \Leftrightarrow \qquad \vett f\big(\vett x_0, \vett \phi (\vett x_0)\big) = 0 \quad \forall \vett x \in \mathcal U, \vett \phi(\vett x) \in \mathcal V \]
+	Moreover
+	\begin{equation}
+		\pd{\vett \phi}{\vett x} = - \left[ \pd{\vett f\big(\vett x,\vett \phi(\vett x)\big)}{\vett x} \right]^{-1} \pd{\vett f\big(\vett x,\vett \phi(\vett x)\big)}{\vett x}
+	\end{equation}
+	
+	\paragraph{General form} The same theorem can be stated similarly considering an initial function $\vett \phi(\vett z): \mathds R^n \rightarrow \mathds R^m$ where $n>m$. The vector $\vett z = (x_1, x_2,\dots, x_n)$ can be partitioned, upon reordering of the variables, in 2 sets $\vett z = (\vett x, \vett y)$ (where $\vett x \in \mathds R^{n-m}$ contains the independent variables while $\vett y \in \mathds R^m$ the dependent one) in such a way that the matrix $\pd{\vett \phi}{\vett y}(\vett x_0,\vett y_0)$ is non-singular: this so allows to use the implicit function theorem to determine a map $\vett \psi$ such that $\vett y = \vett \psi(\vett x)$.
+	
+	We can observe in fact that if the matrix $\pd{\vett \phi}{\vett z} \in \mathds R^{m\times n}$ is full rank (hence all rows of the jacobian are linearly independent), then there exists $m$ linearly independent columns while the remaining $n-m$ are linearly dependent from the others: reordering so the independent/dependent variables allows us to distinguish $\vett x$ from $\vett y$. \\
+	For this reason the map $\vett \psi$ is in general not unique because there exists multiple partitioned sets $(\vett x,\vett y)$ determining a non-singular jacobian.
+	
+	\paragraph{Semi-explicit DAE} Recalling a differential algebraic equation in semi-explicit form 
+	\[\begin{cases}
+		\vett x' & = \vett f(\vett x, \vett y, t) \\ 0 & = \vett g(\vett x, \vett y, t)
+	\end{cases} \]
+	where $\vett x\in \mathds R^n$ are the so called \textit{differential states}, $\vett y \in \mathds R^m$ the \textit{algebraic states} and the maps are $\vett f: \in \mathds R^{n+m+1}\rightarrow \mathds R^n$ and $\vett g: \in \mathds R^{n+m+1}\rightarrow \mathds R^m$. If the matrix $\pd{\vett f}{\vett y} \in \mathds R^{m\times m}$ is non-singular, then for the implicit function theorem we can define the independent and dependent variables respectively as $\vett z^i = (\vett x, t), \vett z^d = \vett y$ such that exists a map $\vett \psi$ for which $\vett y = \vett \psi(\vett x, t)$ and
+	\[ \vett y' = \pd{\vett \psi}{\vett x} \vett x' + \pd{\vett \psi}{t} = \pd{\vett \psi}{\vett x} f + \pd{\vett \psi}{t} = \vett h(\vett x, \vett y, t) \]
+	This means that after 1 derivation the initial DAE in explicit form can be regarded as following ODE:
+	\[\begin{cases}
+		\vett x' & = \vett f(\vett x, \vett y, t) \\ \vett y' & = \vett h(\vett x, \vett y, t)
+	\end{cases}  \qquad + \quad \vett g(\vett x, \vett y, t) = 0 \textrm{ : hidden invariant}\]
 	
 	
 	
